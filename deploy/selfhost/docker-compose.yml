@@ -1,0 +1,76 @@
+# Kairso self-host — LÕI (web + server + realtime). PostgreSQL/Redis/MinIO lấy từ
+# docker-compose.bundled.yml (mặc định) HOẶC bạn trỏ sang dịch vụ ngoài qua .env.
+#
+#   Dùng bản gói sẵn (mặc định):   docker compose up -d
+#     (.env đặt COMPOSE_FILE=docker-compose.yml:docker-compose.bundled.yml)
+#   Dùng Postgres/S3 của riêng bạn: đặt COMPOSE_FILE=docker-compose.yml trong .env,
+#     điền DB_HOST/… và MINIO_ENDPOINT/… trỏ tới dịch vụ ngoài, rồi docker compose up -d
+#
+# DB phải tương thích PostgreSQL; object storage phải tương thích S3.
+name: kairso
+
+services:
+  nginx:
+    image: nginx:alpine
+    restart: unless-stopped
+    depends_on: [web, app]
+    ports:
+      - "${PUBLIC_PORT:-8080}:80"
+    environment:
+      NGINX_MAX_BODY: ${MAX_UPLOAD_SIZE:-200m}
+    volumes:
+      - ./nginx.conf:/etc/nginx/templates/default.conf.template:ro
+    command: >
+      /bin/sh -c "envsubst '$$NGINX_MAX_BODY'
+      < /etc/nginx/templates/default.conf.template
+      > /etc/nginx/nginx.conf && exec nginx -g 'daemon off;'"
+
+  web:
+    image: ${KAIRSO_NS:?Đặt KAIRSO_NS trong .env}/kairso-web:${KAIRSO_TAG:-latest}
+    restart: unless-stopped
+    environment:
+      NODE_ENV: production
+      NEXT_PUBLIC_BASE_URL: http://app:8080     # backend nội bộ (proxy /api/proxy)
+      APP_SIGNATURE_SECRET: ${APP_TOKEN_SECRET} # PHẢI trùng APP_TOKEN_SECRET của server
+      NEXT_PUBLIC_WS_URL: ${WS_URL_OVERRIDE:-}  # rỗng = WS same-origin (/ws)
+      NEXT_PUBLIC_FIREBASE_API_KEY: ${FIREBASE_API_KEY}
+      NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN: ${FIREBASE_AUTH_DOMAIN}
+      NEXT_PUBLIC_FIREBASE_PROJECT_ID: ${FIREBASE_PROJECT_ID}
+      NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET: ${FIREBASE_STORAGE_BUCKET}
+      NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID: ${FIREBASE_MESSAGING_SENDER_ID}
+      NEXT_PUBLIC_FIREBASE_APP_ID: ${FIREBASE_APP_ID}
+
+  app:
+    image: ${KAIRSO_NS:?Đặt KAIRSO_NS trong .env}/kairso-server:${KAIRSO_TAG:-latest}
+    restart: unless-stopped
+    environment:
+      DB_HOST: ${DB_HOST:-postgres}
+      DB_PORT: ${DB_PORT:-5432}
+      DB_USER: ${DB_USER}
+      DB_PASSWORD: ${DB_PASSWORD}
+      DB_NAME: ${DB_NAME}
+      DB_SSLMODE: ${DB_SSLMODE:-disable}
+      REDIS_HOST: ${REDIS_HOST:-redis}
+      REDIS_PORT: ${REDIS_PORT:-6379}
+      JWT_SECRET: ${JWT_SECRET}
+      JWT_ACCESS_EXPIRATION: ${JWT_ACCESS_EXPIRATION:-15m}
+      JWT_REFRESH_EXPIRATION: ${JWT_REFRESH_EXPIRATION:-168h}
+      APP_TOKEN_SECRET: ${APP_TOKEN_SECRET}
+      FIREBASE_CREDENTIALS_PATH: /app/firebase-credentials.json
+      MINIO_ENDPOINT: ${MINIO_ENDPOINT:-minio:9000}
+      MINIO_ACCESS_KEY: ${MINIO_ACCESS_KEY}
+      MINIO_SECRET_KEY: ${MINIO_SECRET_KEY}
+      MINIO_BUCKET: ${MINIO_BUCKET:-kairso}
+      MINIO_USE_SSL: ${MINIO_USE_SSL:-false}
+      # URL trình duyệt tải file/ảnh. Bundled: qua nginx /cdn. S3 ngoài: đặt URL public của S3/CDN.
+      MINIO_PUBLIC_URL: ${MINIO_PUBLIC_URL:-${PUBLIC_URL}/cdn}
+    volumes:
+      - ./firebase-credentials.json:/app/firebase-credentials.json:ro
+
+  migrate:
+    image: ${KAIRSO_NS:?Đặt KAIRSO_NS trong .env}/kairso-server:${KAIRSO_TAG:-latest}
+    restart: "no"
+    environment:
+      GOOSE_DRIVER: postgres
+      GOOSE_DBSTRING: host=${DB_HOST:-postgres} port=${DB_PORT:-5432} user=${DB_USER} password=${DB_PASSWORD} dbname=${DB_NAME} sslmode=${DB_SSLMODE:-disable}
+    command: ["goose", "-dir", "/app/db/migrations", "up"]

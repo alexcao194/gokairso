@@ -1,0 +1,52 @@
+# Overlay gói sẵn PostgreSQL + Redis + MinIO. Gộp cùng docker-compose.yml khi bạn
+# KHÔNG tự lo DB/storage ngoài. Dữ liệu lưu ở ./data/ (giữ khi nâng cấp).
+#
+# Bật bằng cách đặt trong .env:
+#   COMPOSE_FILE=docker-compose.yml:docker-compose.bundled.yml
+name: kairso
+
+services:
+  app:
+    depends_on:
+      postgres: { condition: service_healthy }
+      redis: { condition: service_healthy }
+      minio: { condition: service_started }
+
+  migrate:
+    depends_on:
+      postgres: { condition: service_healthy }
+
+  postgres:
+    image: postgres:15-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: ${DB_USER}
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
+      POSTGRES_DB: ${DB_NAME}
+    volumes:
+      - ./data/postgres:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${DB_USER}"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  redis:
+    image: redis:alpine
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  minio:
+    image: bitnamilegacy/minio:latest
+    restart: unless-stopped
+    environment:
+      MINIO_ROOT_USER: ${MINIO_ACCESS_KEY}
+      MINIO_ROOT_PASSWORD: ${MINIO_SECRET_KEY}
+      MINIO_DEFAULT_BUCKETS: ${MINIO_BUCKET:-kairso}:download
+      MINIO_API_CORS_ALLOW_ORIGIN: "*"
+    volumes:
+      - ./data/minio:/bitnami/minio/data

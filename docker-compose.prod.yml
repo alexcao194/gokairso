@@ -1,0 +1,119 @@
+name: kairso-prod
+
+services:
+  postgres:
+    container_name: kairso-postgres
+    image: postgres:15-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: ${DB_USER}
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
+      POSTGRES_DB: ${DB_NAME}
+    ports:
+      - "${DB_PORT}:5432"
+    volumes:
+      - ./data/postgres:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${DB_USER}"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  redis:
+    container_name: kairso-redis
+    image: redis:alpine
+    restart: unless-stopped
+    healthcheck:
+      test: [ "CMD", "redis-cli", "ping" ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
+
+  minio:
+    container_name: kairso-minio
+    image: bitnamilegacy/minio:latest
+    restart: unless-stopped
+    environment:
+      MINIO_ROOT_USER: ${MINIO_ACCESS_KEY}
+      MINIO_ROOT_PASSWORD: ${MINIO_SECRET_KEY}
+      MINIO_DEFAULT_BUCKETS: ${MINIO_BUCKET:-kairso}:download
+      MINIO_API_CORS_ALLOW_ORIGIN: "*"
+    networks:
+      - default
+      - edge
+    volumes:
+      - ./data/minio:/bitnami/minio/data
+
+  migrate:
+    image: ${APP_IMAGE:-kairso-server:latest}
+    restart: "no"
+    environment:
+      GOOSE_DRIVER: postgres
+      GOOSE_DBSTRING: host=postgres port=5432 user=${DB_USER} password=${DB_PASSWORD} dbname=${DB_NAME} sslmode=${DB_SSLMODE}
+    command: ["goose", "-dir", "/app/db/migrations", "up"]
+    depends_on:
+      postgres:
+        condition: service_healthy
+
+  app:
+    container_name: kairso-app
+    image: ${APP_IMAGE:-kairso-server:latest}
+    restart: unless-stopped
+    environment:
+      DB_HOST: postgres
+      DB_PORT: 5432
+      DB_USER: ${DB_USER}
+      DB_PASSWORD: ${DB_PASSWORD}
+      DB_NAME: ${DB_NAME}
+      DB_SSLMODE: ${DB_SSLMODE}
+      REDIS_HOST: redis
+      REDIS_PORT: 6379
+      JWT_SECRET: ${JWT_SECRET}
+      JWT_ACCESS_EXPIRATION: ${JWT_ACCESS_EXPIRATION}
+      JWT_REFRESH_EXPIRATION: ${JWT_REFRESH_EXPIRATION}
+      FIREBASE_CREDENTIALS_PATH: /app/firebase-credentials.json
+      APP_TOKEN_SECRET: ${APP_TOKEN_SECRET}
+      MINIO_ENDPOINT: minio:9000
+      MINIO_ACCESS_KEY: ${MINIO_ACCESS_KEY}
+      MINIO_SECRET_KEY: ${MINIO_SECRET_KEY}
+      MINIO_BUCKET: ${MINIO_BUCKET:-kairso}
+      MINIO_USE_SSL: "false"
+      MINIO_PUBLIC_URL: ${MINIO_PUBLIC_URL:-http://localhost:${MINIO_API_PORT:-9000}}
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+      minio:
+        condition: service_started
+    volumes:
+      - ./firebase-credentials.json:/app/firebase-credentials.json:ro
+
+  nginx:
+    container_name: kairso-nginx
+    image: nginx:alpine
+    restart: unless-stopped
+    networks:
+      - default
+      - edge
+    volumes:
+      - ./nginx.conf:/etc/nginx/nginx.conf:ro
+    depends_on:
+      - app
+
+  cloudflared:
+    image: cloudflare/cloudflared:latest
+    container_name: gokairso-cloudflared
+    restart: unless-stopped
+    networks:
+      - edge
+    command: tunnel --no-autoupdate run
+    environment:
+      - TUNNEL_TOKEN=${TUNNEL_TOKEN}
+
+networks:
+  default:
+  edge:
+    external: true
+    name: kairso-edge

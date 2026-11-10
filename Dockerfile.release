@@ -1,0 +1,24 @@
+# Build đa kiến trúc (amd64/arm64) cho image public trên Docker Hub.
+# Khác Dockerfile.prod (copy binary dựng sẵn 1 arch), file này build Go TỪ SOURCE
+# bên trong, chạy toolchain native trên BUILDPLATFORM và cross-compile server +
+# goose cho TARGETARCH → `docker buildx --platform linux/amd64,linux/arm64`.
+FROM --platform=$BUILDPLATFORM golang:1.25-alpine AS builder
+WORKDIR /src
+
+COPY go.mod go.sum ./
+RUN go mod download
+COPY . .
+
+ARG TARGETOS
+ARG TARGETARCH
+RUN CGO_ENABLED=0 GOOS=$TARGETOS GOARCH=$TARGETARCH go build -buildvcs=false -o /out/server ./cmd/server \
+ && CGO_ENABLED=0 GOOS=$TARGETOS GOARCH=$TARGETARCH GOBIN=/out go install github.com/pressly/goose/v3/cmd/goose@v3.26.0
+
+FROM alpine:latest
+WORKDIR /app
+RUN apk add --no-cache tzdata
+COPY --from=builder /out/server .
+COPY --from=builder /out/goose /usr/local/bin/goose
+COPY db/migrations /app/db/migrations
+EXPOSE 8080
+CMD ["./server"]

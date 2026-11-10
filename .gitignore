@@ -1,0 +1,41 @@
+# Binaries
+tmp/
+*.exe
+
+# Environment
+.env
+
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Air
+build-errors.log
+
+# Cache
+.cache/
+node_modules/
+
+# Firebase
+credentials/
+
+# Isolated worktrees
+.worktrees/
+
+data/
+tmp/
+logs/
+.cache/
+.claude/
+# Firebase + CI artifacts
+firebase-credentials.json
+deploy-bundle/
+*.tar.gz
+prod.env
+compose.env

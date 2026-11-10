@@ -1,0 +1,147 @@
+# CI/CD: push `main` → build image trên runner → deploy qua SSH vào server prod.
+# Không deploy trực tiếp trên host nữa; mọi bí mật nằm ở GitLab CI/CD Variables.
+#
+# Biến CI/CD cần đặt (Settings → CI/CD → Variables):
+#   # SSH tới server
+#   DEPLOY_SSH_KEY (File/Variable), DEPLOY_HOST, DEPLOY_USER, DEPLOY_SSH_PORT (mặc định 22)
+#   DEPLOY_DIR (tuỳ chọn; mặc định "kairso/server" → ~/kairso/server của DEPLOY_USER)
+#   # App secrets (ghi vào .env trên server)
+#   APP_TOKEN_SECRET, DB_NAME, DB_PASSWORD, DB_PORT, DB_SSLMODE, DB_USER,
+#   JWT_ACCESS_EXPIRATION, JWT_REFRESH_EXPIRATION, JWT_SECRET,
+#   MINIO_ACCESS_KEY, MINIO_API_PORT, MINIO_BUCKET, MINIO_CONSOLE_PORT, MINIO_PUBLIC_URL,
+#   MINIO_SECRET_KEY, NGINX_PORT, REDIS_PORT
+#   FIREBASE_CREDENTIALS_JSON (File) — nội dung firebase-credentials.json
+#   TUNNEL_TOKEN — token Cloudflare Tunnel (chung cho 3 project)
+
+stages:
+  - build
+  - deploy
+  - release
+
+workflow:
+  rules:
+    - if: $CI_COMMIT_TAG =~ /^v/   # tag v* → publish image lên Docker Hub
+
+variables:
+  DOCKER_DRIVER: overlay2
+  DOCKER_BUILDKIT: "1"
+  GOPATH: "$CI_PROJECT_DIR/.cache/go"
+  GOCACHE: "$CI_PROJECT_DIR/.cache/go-build"
+  APP_IMAGE: "kairso-server:$CI_COMMIT_SHA"
+  # Path tương đối → SSH coi là trong home của DEPLOY_USER (~/kairso/server). Biến cùng
+  # tên đặt ở Settings → CI/CD → Variables sẽ override giá trị mặc định này.
+  DEPLOY_DIR: "kairso/server"
+
+build:
+  stage: build
+  image: golang:1.25-alpine
+  interruptible: true
+  services:
+    - docker:27-dind
+  variables:
+    DOCKER_HOST: tcp://docker:2376
+    DOCKER_TLS_CERTDIR: "/certs"
+    DOCKER_TLS_VERIFY: "1"
+    DOCKER_CERT_PATH: "/certs/client"
+  rules:
+    - if: $CI_COMMIT_TAG =~ /^v/
+  before_script:
+    - apk add --no-cache docker-cli docker-cli-buildx
+    - |
+      for _ in $(seq 1 30); do docker info >/dev/null 2>&1 && break; sleep 2; done
+      docker info >/dev/null || { echo "Không kết nối được dind (runner cần privileged = true)"; exit 1; }
+  script:
+    - go build -buildvcs=false -o server ./cmd/server
+    - docker build --pull -f Dockerfile.prod -t "$APP_IMAGE" .
+    - mkdir -p deploy-bundle
+    - docker save "$APP_IMAGE" | gzip > deploy-bundle/server-image.tar.gz
+    - cp docker-compose.prod.yml nginx.conf deploy-bundle/
+  artifacts:
+    expire_in: 1 day
+    paths:
+      - deploy-bundle/
+
+deploy:
+  stage: deploy
+  image: alpine:3.22
+  resource_group: production
+  environment:
+    name: production
+  rules:
+    - if: $CI_COMMIT_TAG =~ /^v/   # chỉ deploy lên server khi có tag v*
+  needs:
+    - job: build
+      artifacts: true
+  before_script:
+    - test -n "$DEPLOY_HOST" && test -n "$DEPLOY_USER" && test -n "$DEPLOY_DIR"
+    - test -f "$FIREBASE_CREDENTIALS_JSON"
+    - test -n "$APP_TOKEN_SECRET" && test -n "$DB_NAME" && test -n "$DB_PASSWORD"
+    - test -n "$DB_PORT" && test -n "$DB_SSLMODE" && test -n "$DB_USER"
+    - test -n "$JWT_ACCESS_EXPIRATION" && test -n "$JWT_REFRESH_EXPIRATION" && test -n "$JWT_SECRET"
+    - test -n "$MINIO_ACCESS_KEY" && test -n "$MINIO_API_PORT" && test -n "$MINIO_BUCKET"
+    - test -n "$MINIO_CONSOLE_PORT" && test -n "$MINIO_PUBLIC_URL" && test -n "$MINIO_SECRET_KEY"
+    - test -n "$NGINX_PORT" && test -n "$REDIS_PORT" && test -n "$TUNNEL_TOKEN"
+    - apk add --no-cache openssh-client
+    - mkdir -p ~/.ssh && chmod 700 ~/.ssh
+    - cp "$DEPLOY_SSH_KEY" ~/.ssh/id_deploy 2>/dev/null || printf '%s\n' "$DEPLOY_SSH_KEY" > ~/.ssh/id_deploy
+    - chmod 600 ~/.ssh/id_deploy
+    - ssh-keyscan -p "${DEPLOY_SSH_PORT:-22}" "$DEPLOY_HOST" >> ~/.ssh/known_hosts 2>/dev/null
+  script:
+    - |
+      umask 077
+      printf '%s\n' \
+        "APP_IMAGE=$APP_IMAGE" \
+        "APP_TOKEN_SECRET=$APP_TOKEN_SECRET" \
+        "DB_NAME=$DB_NAME" "DB_PASSWORD=$DB_PASSWORD" "DB_PORT=$DB_PORT" \
+        "DB_SSLMODE=$DB_SSLMODE" "DB_USER=$DB_USER" \
+        "JWT_ACCESS_EXPIRATION=$JWT_ACCESS_EXPIRATION" \
+        "JWT_REFRESH_EXPIRATION=$JWT_REFRESH_EXPIRATION" "JWT_SECRET=$JWT_SECRET" \
+        "MINIO_ACCESS_KEY=$MINIO_ACCESS_KEY" "MINIO_API_PORT=$MINIO_API_PORT" \
+        "MINIO_BUCKET=$MINIO_BUCKET" "MINIO_CONSOLE_PORT=$MINIO_CONSOLE_PORT" \
+        "MINIO_PUBLIC_URL=$MINIO_PUBLIC_URL" "MINIO_SECRET_KEY=$MINIO_SECRET_KEY" \
+        "NGINX_PORT=$NGINX_PORT" "REDIS_PORT=$REDIS_PORT" \
+        "TUNNEL_TOKEN=$TUNNEL_TOKEN" > prod.env
+    - PORT="${DEPLOY_SSH_PORT:-22}"
+    - SSH="ssh -i ~/.ssh/id_deploy -p $PORT $DEPLOY_USER@$DEPLOY_HOST"
+    - SCP="scp -i ~/.ssh/id_deploy -P $PORT"
+    - $SSH "mkdir -p '$DEPLOY_DIR'"
+    - gzip -dc deploy-bundle/server-image.tar.gz | $SSH "docker load"
+    # Copy lên server với tên chuẩn docker-compose.yml → trên server chạy `docker compose` trần (không cần -f)
+    - $SCP deploy-bundle/docker-compose.prod.yml "$DEPLOY_USER@$DEPLOY_HOST:$DEPLOY_DIR/docker-compose.yml"
+    - $SCP deploy-bundle/nginx.conf "$DEPLOY_USER@$DEPLOY_HOST:$DEPLOY_DIR/nginx.conf"
+    - $SCP prod.env "$DEPLOY_USER@$DEPLOY_HOST:$DEPLOY_DIR/.env"
+    - $SCP "$FIREBASE_CREDENTIALS_JSON" "$DEPLOY_USER@$DEPLOY_HOST:$DEPLOY_DIR/firebase-credentials.json"
+    - $SSH "cd '$DEPLOY_DIR' && docker compose up -d --no-build postgres"
+    - $SSH "cd '$DEPLOY_DIR' && docker compose run --rm migrate"
+    - $SSH "cd '$DEPLOY_DIR' && docker compose up -d --no-build --remove-orphans"
+    # nginx.conf bind-mount → compose không tự nhận đổi; reload để config mới có hiệu lực (no-op nếu không đổi)
+    - $SSH "cd '$DEPLOY_DIR' && docker compose exec -T nginx nginx -s reload"
+    - $SSH "cd '$DEPLOY_DIR' && docker compose ps"
+
+# ----------------------------------------------------------------------------
+# Publish image public (multi-arch amd64+arm64) lên Docker Hub khi push tag v*.
+# CI/CD Variables cần: DOCKERHUB_USER, DOCKERHUB_TOKEN (access token), DOCKERHUB_NAMESPACE.
+release:
+  stage: release
+  image: docker:27
+  services:
+    - docker:27-dind
+  variables:
+    DOCKER_HOST: tcp://docker:2376
+    DOCKER_TLS_CERTDIR: "/certs"
+    DOCKER_TLS_VERIFY: "1"
+    DOCKER_CERT_PATH: "/certs/client"
+  rules:
+    - if: $CI_COMMIT_TAG =~ /^v/
+  before_script:
+    - |
+      for _ in $(seq 1 30); do docker info >/dev/null 2>&1 && break; sleep 2; done
+      docker info >/dev/null || { echo "dind chưa sẵn sàng (runner cần privileged = true)"; exit 1; }
+    - test -n "$DOCKERHUB_NAMESPACE" || { echo "Thiếu DOCKERHUB_NAMESPACE"; exit 1; }
+    - echo "$DOCKERHUB_TOKEN" | docker login -u "$DOCKERHUB_USER" --password-stdin
+    - docker run --privileged --rm tonistiigi/binfmt --install all   # QEMU cho arm64
+    - docker buildx create --use --name kairso >/dev/null 2>&1 || docker buildx use kairso
+  script:
+    - IMG="$DOCKERHUB_NAMESPACE/kairso-server"
+    - docker buildx build --platform linux/amd64,linux/arm64 -f Dockerfile.release
+      -t "$IMG:$CI_COMMIT_TAG" -t "$IMG:latest" --push .

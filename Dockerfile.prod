@@ -1,0 +1,18 @@
+FROM golang:1.25-alpine AS goose-builder
+
+RUN go install github.com/pressly/goose/v3/cmd/goose@v3.26.0
+
+FROM alpine:latest
+WORKDIR /app
+
+# Copy the pre-built binary
+COPY server .
+COPY --from=goose-builder /go/bin/goose /usr/local/bin/goose
+COPY db/migrations /app/db/migrations
+
+# Install tzdata for timezone support
+RUN apk add --no-cache tzdata
+
+EXPOSE 8080
+
+CMD ["./server"]
