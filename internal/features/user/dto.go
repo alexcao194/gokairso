@@ -24,6 +24,7 @@ type UserResponse struct {
 	Bio           string    `json:"bio,omitempty"`
 	Phone         string    `json:"phone,omitempty"`
 	Nickname      string    `json:"nickname,omitempty"`
+	Locale        string    `json:"locale,omitempty"`
 }
 
 type UserSummary struct {
@@ -41,6 +42,7 @@ type UpdateMeRequest struct {
 	Bio      *string `json:"bio,omitempty"`
 	Phone    *string `json:"phone,omitempty"`
 	Nickname *string `json:"nickname,omitempty"`
+	Locale   *string `json:"locale,omitempty"`
 }
 
 type userRow struct {
@@ -59,6 +61,7 @@ type userRow struct {
 	Bio           pgtype.Text
 	Phone         pgtype.Text
 	Nickname      pgtype.Text
+	Locale        string
 }
 
 func dateString(value pgtype.Date) string {
@@ -86,6 +89,7 @@ func userResponseFromRow(row userRow) UserResponse {
 		Bio:           textString(row.Bio),
 		Phone:         textString(row.Phone),
 		Nickname:      textString(row.Nickname),
+		Locale:        row.Locale,
 	}
 }
 
@@ -106,6 +110,7 @@ func userResponseFromDatabaseUser(row database.User) UserResponse {
 		Bio:           row.Bio,
 		Phone:         row.Phone,
 		Nickname:      row.Nickname,
+		Locale:        row.Locale,
 	})
 }
 

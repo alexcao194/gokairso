@@ -6,6 +6,7 @@ import (
 
 	"github.com/alexcao194/kairso/internal/database"
 	"github.com/alexcao194/kairso/internal/features/notification"
+	"github.com/alexcao194/kairso/internal/i18n"
 	"github.com/alexcao194/kairso/pkg/pgutil"
 	"github.com/jackc/pgx/v5/pgtype"
 )
@@ -183,20 +184,9 @@ func (e PerformanceNotificationEvent) ToNotificationEvent() notification.Notific
 		"workspaceId":    e.WorkspaceID,
 		"workspaceAlias": e.WorkspaceAlias,
 	}
-	var title, body string
-	switch e.Type {
-	case NotificationTypeInitiativeCreated:
-		title = "Có sáng kiến mới"
-		body = "Một sáng kiến mới vừa được gửi để xem xét"
-	case NotificationTypeLateLogCreated:
-		title = "Có ghi nhận đi muộn mới"
-		body = "Một ghi nhận đi muộn mới vừa được thêm"
-	case NotificationTypeFeedbackCreated:
-		title = "Có feedback khách hàng mới"
-		body = "Một feedback khách hàng mới vừa được thêm"
-	default:
-		title = "Cập nhật hiệu suất workspace"
-		body = "Một bản ghi hiệu suất workspace vừa được tạo"
+	title, body := i18n.RenderNotification(i18n.Default, e.Type, nil)
+	if title == "" {
+		title, body = i18n.RenderNotification(i18n.Default, "workspace_performance_updated", nil)
 	}
 	return notification.NotificationEvent{
 		UserID:      e.RecipientID,

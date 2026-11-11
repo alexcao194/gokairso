@@ -8,6 +8,7 @@ import (
 
 	"github.com/alexcao194/kairso/internal/database"
 	"github.com/alexcao194/kairso/internal/features/notification"
+	"github.com/alexcao194/kairso/internal/i18n"
 	"github.com/alexcao194/kairso/pkg/pgutil"
 	"github.com/jackc/pgx/v5/pgtype"
 )
@@ -217,60 +218,36 @@ func workspaceResponseFromRow(row workspaceRow) WorkspaceResponse {
 }
 
 func (event WorkspaceNotificationEvent) ToNotificationEvent() notification.NotificationEvent {
+	params := map[string]string{}
+	if event.Role != "" {
+		params["role"] = string(event.Role)
+	}
+	if event.WorkspaceName != "" {
+		params["workspaceName"] = event.WorkspaceName
+	}
+	if event.ActorAlias != "" {
+		params["actor"] = event.ActorAlias
+	}
+
 	data := map[string]string{
 		"type":        event.Type,
 		"targetID":    event.WorkspaceID,
 		"workspaceId": event.WorkspaceID,
 	}
-	if event.Role != "" {
-		data["role"] = string(event.Role)
+	for k, v := range params {
+		data[k] = v
 	}
-	workspaceName := event.WorkspaceName
-	if workspaceName == "" {
-		workspaceName = "workspace này"
-	} else {
-		data["workspaceName"] = workspaceName
+
+	title, body := i18n.RenderNotification(i18n.Default, event.Type, params)
+	if title == "" {
+		title, body = i18n.RenderNotification(i18n.Default, "workspace_updated", params)
 	}
-	actor := event.ActorAlias
-	if actor == "" {
-		actor = "Ai đó"
-	} else {
-		data["actorAlias"] = actor
-	}
-	role := roleLabel(string(event.Role))
-	switch event.Type {
-	case NotificationTypeWorkspaceInvitation:
-		return notification.NotificationEvent{
-			UserID:      event.RecipientID,
-			WorkspaceID: event.WorkspaceID,
-			Title:       "Lời mời vào workspace",
-			Body:        fmt.Sprintf("%s đã mời bạn vào %s với vai trò %s", actor, workspaceName, role),
-			Data:        data,
-		}
-	case NotificationTypeWorkspaceMemberRoleUpdated:
-		return notification.NotificationEvent{
-			UserID:      event.RecipientID,
-			WorkspaceID: event.WorkspaceID,
-			Title:       "Vai trò trong workspace đã thay đổi",
-			Body:        fmt.Sprintf("Vai trò của bạn trong %s đã được đổi thành %s", workspaceName, role),
-			Data:        data,
-		}
-	case NotificationTypeWorkspaceMemberRemoved:
-		return notification.NotificationEvent{
-			UserID:      event.RecipientID,
-			WorkspaceID: event.WorkspaceID,
-			Title:       "Bạn đã bị xoá khỏi workspace",
-			Body:        fmt.Sprintf("Bạn đã bị xoá khỏi %s", workspaceName),
-			Data:        data,
-		}
-	default:
-		return notification.NotificationEvent{
-			UserID:      event.RecipientID,
-			WorkspaceID: event.WorkspaceID,
-			Title:       "Workspace có cập nhật",
-			Body:        "Một workspace đã thay đổi",
-			Data:        data,
-		}
+	return notification.NotificationEvent{
+		UserID:      event.RecipientID,
+		WorkspaceID: event.WorkspaceID,
+		Title:       title,
+		Body:        body,
+		Data:        data,
 	}
 }
 
@@ -749,16 +726,4 @@ func pgtypeText(value *string) pgtype.Text {
 		return pgtype.Text{}
 	}
 	return pgtype.Text{String: *value, Valid: true}
-}
-
-func roleLabel(role string) string {
-	switch role {
-	case "holder":
-		return "chủ workspace"
-	case "admin":
-		return "quản trị viên"
-	case "member":
-		return "thành viên"
-	}
-	return role
 }

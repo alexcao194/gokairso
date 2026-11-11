@@ -106,13 +106,11 @@ const docTemplate = `{
                     },
                     {
                         "type": "integer",
-                        "description": "Page size.",
                         "name": "limit",
                         "in": "query"
                     },
                     {
                         "type": "integer",
-                        "description": "Page number.",
                         "name": "page",
                         "in": "query"
                     }
@@ -637,13 +635,11 @@ const docTemplate = `{
                 "parameters": [
                     {
                         "type": "integer",
-                        "description": "Page size.",
                         "name": "limit",
                         "in": "query"
                     },
                     {
                         "type": "integer",
-                        "description": "Page number.",
                         "name": "page",
                         "in": "query"
                     }
@@ -1224,13 +1220,11 @@ const docTemplate = `{
                     },
                     {
                         "type": "integer",
-                        "description": "Page size.",
                         "name": "limit",
                         "in": "query"
                     },
                     {
                         "type": "integer",
-                        "description": "Page number.",
                         "name": "page",
                         "in": "query"
                     }
@@ -1662,19 +1656,16 @@ const docTemplate = `{
                     },
                     {
                         "type": "integer",
-                        "description": "Page size.",
                         "name": "limit",
                         "in": "query"
                     },
                     {
                         "type": "string",
-                        "description": "Filter task stats (taskCount/totalEstimation) to this month, YYYY-MM.",
                         "name": "month",
                         "in": "query"
                     },
                     {
                         "type": "integer",
-                        "description": "Page number.",
                         "name": "page",
                         "in": "query"
                     }
@@ -2301,13 +2292,11 @@ const docTemplate = `{
                     },
                     {
                         "type": "integer",
-                        "description": "Page size.",
                         "name": "limit",
                         "in": "query"
                     },
                     {
                         "type": "integer",
-                        "description": "Page number.",
                         "name": "page",
                         "in": "query"
                     }
@@ -2645,13 +2634,11 @@ const docTemplate = `{
                 "parameters": [
                     {
                         "type": "integer",
-                        "description": "Page size.",
                         "name": "limit",
                         "in": "query"
                     },
                     {
                         "type": "integer",
-                        "description": "Page number.",
                         "name": "page",
                         "in": "query"
                     }
@@ -2695,13 +2682,11 @@ const docTemplate = `{
                 "parameters": [
                     {
                         "type": "integer",
-                        "description": "Page size.",
                         "name": "limit",
                         "in": "query"
                     },
                     {
                         "type": "integer",
-                        "description": "Page number.",
                         "name": "page",
                         "in": "query"
                     }
@@ -2888,13 +2873,11 @@ const docTemplate = `{
                     },
                     {
                         "type": "integer",
-                        "description": "Page size.",
                         "name": "limit",
                         "in": "query"
                     },
                     {
                         "type": "integer",
-                        "description": "Page number.",
                         "name": "page",
                         "in": "query"
                     }
@@ -3012,13 +2995,11 @@ const docTemplate = `{
                     },
                     {
                         "type": "integer",
-                        "description": "Page size.",
                         "name": "limit",
                         "in": "query"
                     },
                     {
                         "type": "integer",
-                        "description": "Page number.",
                         "name": "page",
                         "in": "query"
                     }
@@ -3311,13 +3292,11 @@ const docTemplate = `{
                     },
                     {
                         "type": "integer",
-                        "description": "Page size.",
                         "name": "limit",
                         "in": "query"
                     },
                     {
                         "type": "integer",
-                        "description": "Page number.",
                         "name": "page",
                         "in": "query"
                     }
@@ -3884,13 +3863,11 @@ const docTemplate = `{
                     },
                     {
                         "type": "integer",
-                        "description": "Page size.",
                         "name": "limit",
                         "in": "query"
                     },
                     {
                         "type": "integer",
-                        "description": "Page number.",
                         "name": "page",
                         "in": "query"
                     }
@@ -4165,13 +4142,11 @@ const docTemplate = `{
                     },
                     {
                         "type": "integer",
-                        "description": "Page size.",
                         "name": "limit",
                         "in": "query"
                     },
                     {
                         "type": "integer",
-                        "description": "Page number.",
                         "name": "page",
                         "in": "query"
                     }
@@ -4835,13 +4810,11 @@ const docTemplate = `{
                     },
                     {
                         "type": "integer",
-                        "description": "Page size.",
                         "name": "limit",
                         "in": "query"
                     },
                     {
                         "type": "integer",
-                        "description": "Page number.",
                         "name": "page",
                         "in": "query"
                     }
@@ -4969,13 +4942,11 @@ const docTemplate = `{
                     },
                     {
                         "type": "integer",
-                        "description": "Page size.",
                         "name": "limit",
                         "in": "query"
                     },
                     {
                         "type": "integer",
-                        "description": "Page number.",
                         "name": "page",
                         "in": "query"
                     }
@@ -5044,13 +5015,11 @@ const docTemplate = `{
                     },
                     {
                         "type": "integer",
-                        "description": "Page size.",
                         "name": "limit",
                         "in": "query"
                     },
                     {
                         "type": "integer",
-                        "description": "Page number.",
                         "name": "page",
                         "in": "query"
                     }
@@ -5749,13 +5718,11 @@ const docTemplate = `{
                     },
                     {
                         "type": "integer",
-                        "description": "Page size.",
                         "name": "limit",
                         "in": "query"
                     },
                     {
                         "type": "integer",
-                        "description": "Page number.",
                         "name": "page",
                         "in": "query"
                     }
@@ -5867,13 +5834,11 @@ const docTemplate = `{
                     },
                     {
                         "type": "integer",
-                        "description": "Page size.",
                         "name": "limit",
                         "in": "query"
                     },
                     {
                         "type": "integer",
-                        "description": "Page number.",
                         "name": "page",
                         "in": "query"
                     }
@@ -6014,13 +5979,11 @@ const docTemplate = `{
                     },
                     {
                         "type": "integer",
-                        "description": "Page size.",
                         "name": "limit",
                         "in": "query"
                     },
                     {
                         "type": "integer",
-                        "description": "Page number.",
                         "name": "page",
                         "in": "query"
                     }
@@ -6132,13 +6095,11 @@ const docTemplate = `{
                     },
                     {
                         "type": "integer",
-                        "description": "Page size.",
                         "name": "limit",
                         "in": "query"
                     },
                     {
                         "type": "integer",
-                        "description": "Page number.",
                         "name": "page",
                         "in": "query"
                     }
@@ -6412,13 +6373,11 @@ const docTemplate = `{
                     },
                     {
                         "type": "integer",
-                        "description": "Page size.",
                         "name": "limit",
                         "in": "query"
                     },
                     {
                         "type": "integer",
-                        "description": "Page number.",
                         "name": "page",
                         "in": "query"
                     }
@@ -6515,13 +6474,11 @@ const docTemplate = `{
                     },
                     {
                         "type": "integer",
-                        "description": "Page size.",
                         "name": "limit",
                         "in": "query"
                     },
                     {
                         "type": "integer",
-                        "description": "Page number.",
                         "name": "page",
                         "in": "query"
                     }
@@ -6712,13 +6669,11 @@ const docTemplate = `{
                     },
                     {
                         "type": "integer",
-                        "description": "Page size.",
                         "name": "limit",
                         "in": "query"
                     },
                     {
                         "type": "integer",
-                        "description": "Page number.",
                         "name": "page",
                         "in": "query"
                     }
@@ -6876,19 +6831,16 @@ const docTemplate = `{
                     },
                     {
                         "type": "integer",
-                        "description": "Page size.",
                         "name": "limit",
                         "in": "query"
                     },
                     {
                         "type": "string",
-                        "description": "Filter task stats (taskCount/totalEstimation) to this month, YYYY-MM.",
                         "name": "month",
                         "in": "query"
                     },
                     {
                         "type": "integer",
-                        "description": "Page number.",
                         "name": "page",
                         "in": "query"
                     }
@@ -7421,13 +7373,11 @@ const docTemplate = `{
                     },
                     {
                         "type": "integer",
-                        "description": "Page size.",
                         "name": "limit",
                         "in": "query"
                     },
                     {
                         "type": "integer",
-                        "description": "Page number.",
                         "name": "page",
                         "in": "query"
                     }
@@ -7570,13 +7520,11 @@ const docTemplate = `{
                     },
                     {
                         "type": "integer",
-                        "description": "Page size.",
                         "name": "limit",
                         "in": "query"
                     },
                     {
                         "type": "integer",
-                        "description": "Page number.",
                         "name": "page",
                         "in": "query"
                     }
@@ -7622,13 +7570,11 @@ const docTemplate = `{
                     },
                     {
                         "type": "integer",
-                        "description": "Page size.",
                         "name": "limit",
                         "in": "query"
                     },
                     {
                         "type": "integer",
-                        "description": "Page number.",
                         "name": "page",
                         "in": "query"
                     }
@@ -7724,13 +7670,11 @@ const docTemplate = `{
                     },
                     {
                         "type": "integer",
-                        "description": "Page size.",
                         "name": "limit",
                         "in": "query"
                     },
                     {
                         "type": "integer",
-                        "description": "Page number.",
                         "name": "page",
                         "in": "query"
                     }
@@ -7936,13 +7880,11 @@ const docTemplate = `{
                     },
                     {
                         "type": "integer",
-                        "description": "Page size.",
                         "name": "limit",
                         "in": "query"
                     },
                     {
                         "type": "integer",
-                        "description": "Page number.",
                         "name": "page",
                         "in": "query"
                     },
@@ -8173,13 +8115,11 @@ const docTemplate = `{
                     },
                     {
                         "type": "integer",
-                        "description": "Page size.",
                         "name": "limit",
                         "in": "query"
                     },
                     {
                         "type": "integer",
-                        "description": "Page number.",
                         "name": "page",
                         "in": "query"
                     }
@@ -8421,13 +8361,11 @@ const docTemplate = `{
                     },
                     {
                         "type": "integer",
-                        "description": "Page size.",
                         "name": "limit",
                         "in": "query"
                     },
                     {
                         "type": "integer",
-                        "description": "Page number.",
                         "name": "page",
                         "in": "query"
                     }
@@ -8642,13 +8580,11 @@ const docTemplate = `{
                     },
                     {
                         "type": "integer",
-                        "description": "Page size.",
                         "name": "limit",
                         "in": "query"
                     },
                     {
                         "type": "integer",
-                        "description": "Page number.",
                         "name": "page",
                         "in": "query"
                     }
@@ -8894,13 +8830,11 @@ const docTemplate = `{
                     },
                     {
                         "type": "integer",
-                        "description": "Page size.",
                         "name": "limit",
                         "in": "query"
                     },
                     {
                         "type": "integer",
-                        "description": "Page number.",
                         "name": "page",
                         "in": "query"
                     }
@@ -9075,13 +9009,11 @@ const docTemplate = `{
                     },
                     {
                         "type": "integer",
-                        "description": "Page size.",
                         "name": "limit",
                         "in": "query"
                     },
                     {
                         "type": "integer",
-                        "description": "Page number.",
                         "name": "page",
                         "in": "query"
                     }
@@ -9144,13 +9076,11 @@ const docTemplate = `{
                     },
                     {
                         "type": "integer",
-                        "description": "Page size.",
                         "name": "limit",
                         "in": "query"
                     },
                     {
                         "type": "integer",
-                        "description": "Page number.",
                         "name": "page",
                         "in": "query"
                     }
@@ -9232,13 +9162,11 @@ const docTemplate = `{
                     },
                     {
                         "type": "integer",
-                        "description": "Page size.",
                         "name": "limit",
                         "in": "query"
                     },
                     {
                         "type": "integer",
-                        "description": "Page number.",
                         "name": "page",
                         "in": "query"
                     }
@@ -9813,7 +9741,6 @@ const docTemplate = `{
                     "type": "string"
                 },
                 "originalCheckInAt": {
-                    "description": "Original*At snapshots the target record's time as of submission (only\nset alongside a Target*RecordID), so a decision can always be\nreverted to it.",
                     "type": "string",
                     "format": "date-time"
                 },
@@ -9825,7 +9752,6 @@ const docTemplate = `{
                     "type": "string"
                 },
                 "resultCheckInRecordId": {
-                    "description": "Result*RecordID is the attendance_records row currently reflecting\neach half's applied state (freshly created, or == the target id once\nan edit is approved). Empty while pending/rejected.",
                     "type": "string"
                 },
                 "resultCheckOutRecordId": {
@@ -9835,7 +9761,6 @@ const docTemplate = `{
                     "$ref": "#/definitions/AttendanceCorrectionStatus"
                 },
                 "targetCheckInRecordId": {
-                    "description": "Target*RecordID is set when this half corrects an EXISTING\nattendance_records row rather than adding a new one.",
                     "type": "string"
                 },
                 "targetCheckOutRecordId": {
@@ -10110,11 +10035,9 @@ const docTemplate = `{
                     "type": "string"
                 },
                 "kpi": {
-                    "description": "same as Score",
                     "type": "number"
                 },
                 "score": {
-                    "description": "Score set by admin/holder for the period (raw value, direct KPI %).",
                     "type": "number"
                 }
             }
@@ -10306,7 +10229,6 @@ const docTemplate = `{
                     "type": "string"
                 },
                 "registeredById": {
-                    "description": "Who submitted this day — the member themselves for a self-\nregistration, or the holder who filled it in on their behalf. Empty\nfor rows created before this was tracked.",
                     "type": "string"
                 },
                 "registeredByName": {
@@ -10377,7 +10299,6 @@ const docTemplate = `{
                     "type": "string"
                 },
                 "folderId": {
-                    "description": "rỗng = gốc workspace",
                     "type": "string"
                 },
                 "isPublic": {
@@ -10404,7 +10325,6 @@ const docTemplate = `{
                     "type": "string"
                 },
                 "parentId": {
-                    "description": "rỗng = gốc workspace",
                     "type": "string"
                 }
             }
@@ -10467,7 +10387,6 @@ const docTemplate = `{
                     "format": "date"
                 },
                 "projectId": {
-                    "description": "ProjectID scopes the minutes to a project; empty = workspace level.",
                     "type": "string"
                 },
                 "recorders": {
@@ -10805,15 +10724,12 @@ const docTemplate = `{
             "type": "object",
             "properties": {
                 "kpi": {
-                    "description": "KPI contribution = Score * 1 % (expressed as a percentage value, e.g. 7.0 means 7 %).",
                     "type": "number"
                 },
                 "rawEstimate": {
-                    "description": "Raw sum of feedback estimates (beneficiary-weighted) for this member.",
                     "type": "number"
                 },
                 "score": {
-                    "description": "Score after clamping to [0, 10], with default of 5.",
                     "type": "number"
                 }
             }
@@ -11008,7 +10924,6 @@ const docTemplate = `{
             "type": "object",
             "properties": {
                 "allowedTypes": {
-                    "description": "csv đuôi file, rỗng = mọi loại",
                     "type": "string"
                 },
                 "maxFileSizeMb": {
@@ -11062,7 +10977,6 @@ const docTemplate = `{
                     "type": "string"
                 },
                 "locked": {
-                    "description": "kind != custom → không sửa cấu trúc",
                     "type": "boolean"
                 },
                 "moduleId": {
@@ -11100,15 +11014,12 @@ const docTemplate = `{
             "type": "object",
             "properties": {
                 "kpi": {
-                    "description": "KPI contribution = Score * 1 %.",
                     "type": "number"
                 },
                 "rawEstimate": {
-                    "description": "Sum of approved initiative estimates within the period.",
                     "type": "number"
                 },
                 "score": {
-                    "description": "Clamped to [0, 5].",
                     "type": "number"
                 }
             }
@@ -11324,7 +11235,6 @@ const docTemplate = `{
             "type": "object",
             "properties": {
                 "availableMembers": {
-                    "description": "AvailableMembers (workspace members not yet on the project, for the\ninvite picker) is only populated when the request opted in via\n?includeAvailable=true — omitted (not an empty array) otherwise, so a\nplain roster read doesn't pay to compute it. See\nrepository.ListProjectMembers.",
                     "type": "array",
                     "items": {
                         "$ref": "#/definitions/ProjectAvailableMemberResponse"
@@ -11385,11 +11295,9 @@ const docTemplate = `{
                     "type": "string"
                 },
                 "id": {
-                    "description": "ID is a client-generated stable id; the server fills one in when empty.",
                     "type": "string"
                 },
                 "module": {
-                    "description": "Module is the sub-system the row is about (\"phân hệ\"), free text.",
                     "type": "string"
                 },
                 "note": {
@@ -11411,7 +11319,6 @@ const docTemplate = `{
                     ]
                 },
                 "status": {
-                    "description": "Status is used by deployed rows: open = waiting to be rolled out.",
                     "enum": [
                         "open",
                         "done"
@@ -11593,14 +11500,12 @@ const docTemplate = `{
             "type": "object",
             "properties": {
                 "bugTasks": {
-                    "description": "BugTasks: member is a fault holder.",
                     "type": "array",
                     "items": {
                         "$ref": "#/definitions/MemberTaskBrief"
                     }
                 },
                 "completedLateTasks": {
-                    "description": "CompletedLateTasks: member is a worker and the task was finished after its due date.",
                     "type": "array",
                     "items": {
                         "$ref": "#/definitions/MemberTaskBrief"
@@ -11616,14 +11521,12 @@ const docTemplate = `{
                     "type": "string"
                 },
                 "overdueTasks": {
-                    "description": "OverdueTasks: member is a worker, task still open and past its due date.",
                     "type": "array",
                     "items": {
                         "$ref": "#/definitions/MemberTaskBrief"
                     }
                 },
                 "reworkTasks": {
-                    "description": "ReworkTasks: member is a worker and the task was sent back (return_count \u003e 0).",
                     "type": "array",
                     "items": {
                         "$ref": "#/definitions/MemberTaskBrief"
@@ -11745,7 +11648,6 @@ const docTemplate = `{
             "type": "object",
             "properties": {
                 "attachmentCount": {
-                    "description": "AttachmentCount is how many documents are uploaded to the module.",
                     "type": "integer"
                 },
                 "createdAt": {
@@ -11770,7 +11672,6 @@ const docTemplate = `{
                     "format": "date-time"
                 },
                 "sprints": {
-                    "description": "Sprints are the module's own time-boxes, oldest first.",
                     "type": "array",
                     "items": {
                         "$ref": "#/definitions/ModuleSprintResponse"
@@ -11781,7 +11682,6 @@ const docTemplate = `{
                     "format": "date-time"
                 },
                 "status": {
-                    "description": "Status is the Scrum lifecycle. EndDate is the target release date;\nStartDate follows the first sprint once the module has sprints.",
                     "enum": [
                         "backlog",
                         "in_progress",
@@ -11818,7 +11718,6 @@ const docTemplate = `{
                     "format": "date"
                 },
                 "goal": {
-                    "description": "Goal is the Sprint Goal agreed at Sprint Planning.",
                     "type": "string"
                 },
                 "id": {
@@ -11834,7 +11733,6 @@ const docTemplate = `{
                     "type": "string"
                 },
                 "reviewNote": {
-                    "description": "ReviewNote / RetroNote record the Sprint Review and Retrospective.",
                     "type": "string"
                 },
                 "startDate": {
@@ -11866,18 +11764,6 @@ const docTemplate = `{
                 "in_progress",
                 "done",
                 "released"
-            ],
-            "x-enum-comments": {
-                "ModuleStatusBacklog": "in the Product Backlog",
-                "ModuleStatusDone": "meets the Definition of Done",
-                "ModuleStatusInProgress": "being built across sprints",
-                "ModuleStatusReleased": "increment shipped to users"
-            },
-            "x-enum-descriptions": [
-                "in the Product Backlog",
-                "being built across sprints",
-                "meets the Definition of Done",
-                "increment shipped to users"
             ],
             "x-enum-varnames": [
                 "ModuleStatusBacklog",
@@ -12150,11 +12036,9 @@ const docTemplate = `{
             "type": "object",
             "properties": {
                 "kpi": {
-                    "description": "KPI contribution = (1 - LateRatio) * 35 %.",
                     "type": "number"
                 },
                 "lateRatio": {
-                    "description": "Ratio of late tasks among reviewed/done tasks (0–1).",
                     "type": "number"
                 },
                 "lateWorkerEstimation": {
@@ -12215,7 +12099,6 @@ const docTemplate = `{
             "type": "object",
             "properties": {
                 "code": {
-                    "description": "Code is a human-readable, copyable identifier derived from the\nproject name and SequenceNo, e.g. \"#KAIRSO-F7\" — resolved in hydrate\nrather than stored, mirroring task.Code/task.FeedbackCode.",
                     "type": "string"
                 },
                 "content": {
@@ -12536,7 +12419,6 @@ const docTemplate = `{
             "type": "object",
             "properties": {
                 "endDate": {
-                    "description": "EndDate is the target release date.",
                     "type": "string",
                     "format": "date-time"
                 },
@@ -12639,23 +12521,18 @@ const docTemplate = `{
             "type": "object",
             "properties": {
                 "deduction": {
-                    "description": "Deduction points, clamped to [0, 15]. = (LateDays + EarlyLeaveDays) * 1 + RawEstimate, clamped.",
                     "type": "number"
                 },
                 "earlyLeaveDays": {
-                    "description": "Count of days the member checked out before the schedule end.",
                     "type": "integer"
                 },
                 "kpi": {
-                    "description": "Points earned toward the PunctualityWeight cap = PunctualityWeight - Deduction (not negative — this is\n\"points remaining after deduction\", mirroring how the other categories contribute a positive amount).",
                     "type": "number"
                 },
                 "lateDays": {
-                    "description": "Count of days the member checked in after the schedule start.",
                     "type": "integer"
                 },
                 "rawEstimate": {
-                    "description": "Sum of late-log estimates within the period.",
                     "type": "number"
                 }
             }
@@ -12664,11 +12541,9 @@ const docTemplate = `{
             "type": "object",
             "properties": {
                 "kpi": {
-                    "description": "KPI contribution = Ratio * 30 %.",
                     "type": "number"
                 },
                 "ratio": {
-                    "description": "Ratio of clean (non-bug) work (0–1).",
                     "type": "number"
                 },
                 "totalBugEstimation": {
@@ -13271,7 +13146,6 @@ const docTemplate = `{
                     "type": "string"
                 },
                 "month": {
-                    "description": "YYYY-MM",
                     "type": "string"
                 },
                 "score": {
@@ -13544,7 +13418,6 @@ const docTemplate = `{
                     "type": "boolean"
                 },
                 "code": {
-                    "description": "Code is a human-readable, copyable task identifier derived from the\nproject name and SequenceNo, e.g. \"#KAIRSO-42\". Resolved in\nhydrateTask rather than stored, so it always reflects the project's\ncurrent name.",
                     "type": "string"
                 },
                 "createdAt": {
@@ -13587,7 +13460,6 @@ const docTemplate = `{
                     }
                 },
                 "linkedFeedbackCount": {
-                    "description": "LinkedFeedbackCount is how many public-project-feedback items link to\nthis task — surfaced so the UI can show a \"view feedback\" affordance\nonly on tasks that actually have any, without a separate lookup per row.",
                     "type": "integer"
                 },
                 "moduleId": {
@@ -13619,7 +13491,6 @@ const docTemplate = `{
                     "type": "string"
                 },
                 "unreadCommentCount": {
-                    "description": "UnreadCommentCount is how many of this task's comments the CALLER\n(not just anyone) hasn't read yet — see task_comment_reads. Only\npopulated where the caller's identity is available and worth the\nextra query (list/update endpoints); 0 elsewhere, not \"definitely\nread\".",
                     "type": "integer"
                 },
                 "updatedAt": {
@@ -13688,7 +13559,6 @@ const docTemplate = `{
                     "type": "string"
                 },
                 "priority1": {
-                    "description": "Priority1..4 là số task theo độ ưu tiên thô (1..4, 4 = Gấp/P0), độc lập với trạng thái.",
                     "type": "integer"
                 },
                 "priority2": {
@@ -13730,7 +13600,6 @@ const docTemplate = `{
             "type": "object",
             "properties": {
                 "avgCycleDays": {
-                    "description": "AvgCycleDays: thời gian hoàn thành trung bình (ngày) từ lúc tạo đến lần hoàn thành\nđầu tiên — tính độc lập trên toàn bộ task khớp bộ lọc, không cộng dồn được từ các\ndòng Members (xem GetTaskCycleTimeByWorkspaceAlias). CycleTimeSampleSize là số task\nđã tính (0 nếu chưa có task nào hoàn thành trong kỳ).",
                     "type": "number"
                 },
                 "backlog": {
@@ -13850,7 +13719,6 @@ const docTemplate = `{
                     "type": "boolean"
                 },
                 "code": {
-                    "description": "Code is a human-readable, copyable task identifier derived from the\nproject name and SequenceNo, e.g. \"#KAIRSO-42\". Resolved in\nhydrateTask rather than stored, so it always reflects the project's\ncurrent name.",
                     "type": "string"
                 },
                 "createdAt": {
@@ -13896,11 +13764,9 @@ const docTemplate = `{
                     "$ref": "#/definitions/ThreadLatestCommentResponse"
                 },
                 "linkedFeedbackCount": {
-                    "description": "LinkedFeedbackCount is how many public-project-feedback items link to\nthis task — surfaced so the UI can show a \"view feedback\" affordance\nonly on tasks that actually have any, without a separate lookup per row.",
                     "type": "integer"
                 },
                 "mentioned": {
-                    "description": "Mentioned is true if the caller was ever @mentioned in one of this\ntask's comments (task_comment_mentions) — as opposed to only being\nassigned to it — drives the \"@\" vs generic chat-icon affordance\nclient-side.",
                     "type": "boolean"
                 },
                 "moduleId": {
@@ -13932,7 +13798,6 @@ const docTemplate = `{
                     "type": "string"
                 },
                 "unreadCommentCount": {
-                    "description": "UnreadCommentCount is how many of this task's comments the CALLER\n(not just anyone) hasn't read yet — see task_comment_reads. Only\npopulated where the caller's identity is available and worth the\nextra query (list/update endpoints); 0 elsewhere, not \"definitely\nread\".",
                     "type": "integer"
                 },
                 "updatedAt": {
@@ -13995,7 +13860,6 @@ const docTemplate = `{
                     "type": "string"
                 },
                 "locked": {
-                    "description": "kind != custom → không sửa cấu trúc",
                     "type": "boolean"
                 },
                 "moduleId": {
@@ -14089,7 +13953,6 @@ const docTemplate = `{
             "type": "object",
             "properties": {
                 "folderId": {
-                    "description": "\"\" = gốc workspace",
                     "type": "string"
                 },
                 "isPublic": {
@@ -14110,7 +13973,6 @@ const docTemplate = `{
                     "type": "string"
                 },
                 "parentId": {
-                    "description": "\"\" = chuyển về gốc",
                     "type": "string"
                 }
             }
@@ -14166,6 +14028,9 @@ const docTemplate = `{
                     "type": "string"
                 },
                 "birthday": {
+                    "type": "string"
+                },
+                "locale": {
                     "type": "string"
                 },
                 "name": {
@@ -14633,6 +14498,9 @@ const docTemplate = `{
                 "id": {
                     "type": "string"
                 },
+                "locale": {
+                    "type": "string"
+                },
                 "name": {
                     "type": "string"
                 },
@@ -14748,7 +14616,6 @@ const docTemplate = `{
                     "type": "string"
                 },
                 "registeredById": {
-                    "description": "Who submitted this day — the member themselves for a self-\nregistration, or the holder who filled it in on their behalf. Empty\nfor rows created before this was tracked.",
                     "type": "string"
                 },
                 "registeredByName": {

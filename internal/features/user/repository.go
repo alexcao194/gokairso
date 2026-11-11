@@ -83,6 +83,7 @@ func (r *repository) UpdateUser(ctx context.Context, id string, req UpdateMeRequ
 		Phone:           pgtypeTextFromStringPtr(req.Phone),
 		NicknamePresent: req.Nickname != nil,
 		Nickname:        pgtypeTextFromStringPtr(req.Nickname),
+		Locale:          pgtypeTextFromStringPtr(req.Locale),
 	})
 	if err != nil {
 		return nil, err

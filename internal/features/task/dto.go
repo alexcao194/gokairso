@@ -11,6 +11,7 @@ import (
 	"github.com/alexcao194/kairso/internal/database"
 	"github.com/alexcao194/kairso/internal/features/notification"
 	"github.com/alexcao194/kairso/internal/features/user"
+	"github.com/alexcao194/kairso/internal/i18n"
 	"github.com/alexcao194/kairso/pkg/pagination"
 	"github.com/alexcao194/kairso/pkg/pgutil"
 	"github.com/google/uuid"
@@ -402,64 +403,23 @@ func (event TaskNotificationEvent) ToNotificationEvent() notification.Notificati
 		"projectId":   event.ProjectID,
 		"workspaceId": event.WorkspaceID,
 	}
+	params := map[string]string{}
+	if event.Title != "" {
+		params["taskTitle"] = event.Title
+	}
+	if event.CallerAlias != "" {
+		params["caller"] = event.CallerAlias
+	}
 	if event.Status != "" {
 		data["status"] = string(event.Status)
+		params["status"] = string(event.Status)
 	}
-	caller := event.CallerAlias
-	if caller == "" {
-		caller = "Ai đó"
-	}
-	status := taskStatusLabel(string(event.Status))
+
+	renderType := event.Type
 	switch event.Type {
-	case NotificationTypeTaskAssigned:
-		return notification.NotificationEvent{
-			UserID:      event.RecipientID,
-			WorkspaceID: event.WorkspaceID,
-			Title:       "Bạn được giao task",
-			Body:        fmt.Sprintf("%s đã giao task \"%s\" cho bạn", caller, event.Title),
-			Data:        data,
-		}
-	case NotificationTypeTaskUnassigned:
-		return notification.NotificationEvent{
-			UserID:      event.RecipientID,
-			WorkspaceID: event.WorkspaceID,
-			Title:       "Bạn được gỡ khỏi task",
-			Body:        fmt.Sprintf("%s đã gỡ bạn khỏi task \"%s\"", caller, event.Title),
-			Data:        data,
-		}
-	case NotificationTypeTaskStatusUpdated:
-		return notification.NotificationEvent{
-			UserID:      event.RecipientID,
-			WorkspaceID: event.WorkspaceID,
-			Title:       "Trạng thái task đã thay đổi",
-			Body:        fmt.Sprintf("%s đã chuyển \"%s\" sang trạng thái %s", caller, event.Title, status),
-			Data:        data,
-		}
-	case NotificationTypeTaskFaultHolderAssigned:
-		return notification.NotificationEvent{
-			UserID:      event.RecipientID,
-			WorkspaceID: event.WorkspaceID,
-			Title:       "Task được trả lại cho bạn",
-			Body:        fmt.Sprintf("%s đã chỉ định bạn chịu lỗi cho task \"%s\"", caller, event.Title),
-			Data:        data,
-		}
-	case NotificationTypeTaskFaultHolderUnassigned:
-		return notification.NotificationEvent{
-			UserID:      event.RecipientID,
-			WorkspaceID: event.WorkspaceID,
-			Title:       "Bạn không còn chịu lỗi task",
-			Body:        fmt.Sprintf("%s đã gỡ bạn khỏi vai trò chịu lỗi của task \"%s\"", caller, event.Title),
-			Data:        data,
-		}
 	case NotificationTypeTaskDeadlineReminder:
 		data["dueAt"] = event.DueAt.Format(time.RFC3339)
-		return notification.NotificationEvent{
-			UserID:      event.RecipientID,
-			WorkspaceID: event.WorkspaceID,
-			Title:       "Task sắp đến hạn",
-			Body:        fmt.Sprintf("Task \"%s\" đến hạn vào %s", event.Title, event.DueAt.Format("15:04 02/01/2006")),
-			Data:        data,
-		}
+		params["dueAt"] = event.DueAt.Format("15:04 02/01/2006")
 	case NotificationTypeTaskCommentAdded:
 		snippet := plainTextPreview(event.Comment)
 		if len(snippet) > 120 {
@@ -468,28 +428,26 @@ func (event TaskNotificationEvent) ToNotificationEvent() notification.Notificati
 		if snippet == "" && event.HasAttachment {
 			snippet = "đã gửi một tệp đính kèm"
 		}
-		title := "Bình luận mới"
-		body := fmt.Sprintf("%s đã bình luận trong \"%s\": %s", caller, event.Title, snippet)
-		if event.Mentioned {
-			title = "Bạn được nhắc đến"
-			body = fmt.Sprintf("%s đã nhắc đến bạn trong \"%s\": %s", caller, event.Title, snippet)
-		}
+		params["snippet"] = snippet
 		data["mentioned"] = strconv.FormatBool(event.Mentioned)
-		return notification.NotificationEvent{
-			UserID:      event.RecipientID,
-			WorkspaceID: event.WorkspaceID,
-			Title:       title,
-			Body:        body,
-			Data:        data,
+		if event.Mentioned {
+			renderType = "task_mentioned"
 		}
-	default:
-		return notification.NotificationEvent{
-			UserID:      event.RecipientID,
-			WorkspaceID: event.WorkspaceID,
-			Title:       "Task có cập nhật",
-			Body:        fmt.Sprintf("Task \"%s\" đã được cập nhật", event.Title),
-			Data:        data,
-		}
+	}
+	for k, v := range params {
+		data[k] = v
+	}
+
+	title, body := i18n.RenderNotification(i18n.Default, renderType, params)
+	if title == "" {
+		title, body = i18n.RenderNotification(i18n.Default, "task_updated", params)
+	}
+	return notification.NotificationEvent{
+		UserID:      event.RecipientID,
+		WorkspaceID: event.WorkspaceID,
+		Title:       title,
+		Body:        body,
+		Data:        data,
 	}
 }
 
@@ -1209,22 +1167,4 @@ func pgtypeText(s *string) pgtype.Text {
 		return pgtype.Text{Valid: false}
 	}
 	return pgtype.Text{String: *s, Valid: true}
-}
-
-func taskStatusLabel(status string) string {
-	switch status {
-	case "backlog":
-		return "Backlog"
-	case "todo":
-		return "Cần làm"
-	case "in_progress":
-		return "Đang làm"
-	case "review":
-		return "Chờ duyệt"
-	case "done":
-		return "Hoàn thành"
-	case "canceled":
-		return "Đã huỷ"
-	}
-	return status
 }

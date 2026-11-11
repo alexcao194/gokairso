@@ -1,7 +1,7 @@
 -- name: GetUserByID :one
 SELECT id, created_at, updated_at, deleted_at, name, alias, avatar,
        firebase_uid, email, email_verified, firebase_provider, last_sign_in_at,
-       birthday, bio, phone, nickname
+       birthday, bio, phone, nickname, locale
 FROM users
 WHERE id = $1 AND deleted_at IS NULL
 LIMIT 1;
@@ -9,7 +9,7 @@ LIMIT 1;
 -- name: GetUserByAlias :one
 SELECT id, created_at, updated_at, deleted_at, name, alias, avatar,
        firebase_uid, email, email_verified, firebase_provider, last_sign_in_at,
-       birthday, bio, phone, nickname
+       birthday, bio, phone, nickname, locale
 FROM users
 WHERE alias = $1 AND deleted_at IS NULL
 LIMIT 1;
@@ -38,11 +38,12 @@ SET
     nickname = CASE
         WHEN sqlc.arg(nickname_present)::boolean THEN sqlc.narg(nickname)
         ELSE nickname
-    END
+    END,
+    locale = COALESCE(sqlc.narg(locale), locale)
 WHERE id = $1 AND deleted_at IS NULL
 RETURNING id, created_at, updated_at, deleted_at, name, alias, avatar,
           firebase_uid, email, email_verified, firebase_provider, last_sign_in_at,
-          birthday, bio, phone, nickname;
+          birthday, bio, phone, nickname, locale;
 
 -- name: UpdateFirebaseUser :one
 UPDATE users
@@ -60,11 +61,11 @@ SET
 WHERE firebase_uid = $1
 RETURNING id, created_at, updated_at, deleted_at, name, alias, avatar,
           firebase_uid, email, email_verified, firebase_provider, last_sign_in_at,
-          birthday, bio, phone, nickname;
+          birthday, bio, phone, nickname, locale;
 
 -- name: InsertFirebaseUser :one
 INSERT INTO users (name, alias, avatar, firebase_uid, email, email_verified, firebase_provider, last_sign_in_at)
 VALUES ($1, $2, NULLIF($3, ''), $4, NULLIF($5, ''), $6, $7, NOW())
 RETURNING id, created_at, updated_at, deleted_at, name, alias, avatar,
           firebase_uid, email, email_verified, firebase_provider, last_sign_in_at,
-          birthday, bio, phone, nickname;
+          birthday, bio, phone, nickname, locale;

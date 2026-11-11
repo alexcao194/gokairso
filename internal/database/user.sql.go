@@ -14,7 +14,7 @@ import (
 const getUserByAlias = `-- name: GetUserByAlias :one
 SELECT id, created_at, updated_at, deleted_at, name, alias, avatar,
        firebase_uid, email, email_verified, firebase_provider, last_sign_in_at,
-       birthday, bio, phone, nickname
+       birthday, bio, phone, nickname, locale
 FROM users
 WHERE alias = $1 AND deleted_at IS NULL
 LIMIT 1
@@ -40,6 +40,7 @@ func (q *Queries) GetUserByAlias(ctx context.Context, alias string) (User, error
 		&i.Bio,
 		&i.Phone,
 		&i.Nickname,
+		&i.Locale,
 	)
 	return i, err
 }
@@ -47,7 +48,7 @@ func (q *Queries) GetUserByAlias(ctx context.Context, alias string) (User, error
 const getUserByID = `-- name: GetUserByID :one
 SELECT id, created_at, updated_at, deleted_at, name, alias, avatar,
        firebase_uid, email, email_verified, firebase_provider, last_sign_in_at,
-       birthday, bio, phone, nickname
+       birthday, bio, phone, nickname, locale
 FROM users
 WHERE id = $1 AND deleted_at IS NULL
 LIMIT 1
@@ -73,6 +74,7 @@ func (q *Queries) GetUserByID(ctx context.Context, id pgtype.UUID) (User, error)
 		&i.Bio,
 		&i.Phone,
 		&i.Nickname,
+		&i.Locale,
 	)
 	return i, err
 }
@@ -82,7 +84,7 @@ INSERT INTO users (name, alias, avatar, firebase_uid, email, email_verified, fir
 VALUES ($1, $2, NULLIF($3, ''), $4, NULLIF($5, ''), $6, $7, NOW())
 RETURNING id, created_at, updated_at, deleted_at, name, alias, avatar,
           firebase_uid, email, email_verified, firebase_provider, last_sign_in_at,
-          birthday, bio, phone, nickname
+          birthday, bio, phone, nickname, locale
 `
 
 type InsertFirebaseUserParams struct {
@@ -123,6 +125,7 @@ func (q *Queries) InsertFirebaseUser(ctx context.Context, arg InsertFirebaseUser
 		&i.Bio,
 		&i.Phone,
 		&i.Nickname,
+		&i.Locale,
 	)
 	return i, err
 }
@@ -143,7 +146,7 @@ SET
 WHERE firebase_uid = $1
 RETURNING id, created_at, updated_at, deleted_at, name, alias, avatar,
           firebase_uid, email, email_verified, firebase_provider, last_sign_in_at,
-          birthday, bio, phone, nickname
+          birthday, bio, phone, nickname, locale
 `
 
 type UpdateFirebaseUserParams struct {
@@ -182,6 +185,7 @@ func (q *Queries) UpdateFirebaseUser(ctx context.Context, arg UpdateFirebaseUser
 		&i.Bio,
 		&i.Phone,
 		&i.Nickname,
+		&i.Locale,
 	)
 	return i, err
 }
@@ -210,11 +214,12 @@ SET
     nickname = CASE
         WHEN $11::boolean THEN $12
         ELSE nickname
-    END
+    END,
+    locale = COALESCE($13, locale)
 WHERE id = $1 AND deleted_at IS NULL
 RETURNING id, created_at, updated_at, deleted_at, name, alias, avatar,
           firebase_uid, email, email_verified, firebase_provider, last_sign_in_at,
-          birthday, bio, phone, nickname
+          birthday, bio, phone, nickname, locale
 `
 
 type UpdateUserProfileParams struct {
@@ -230,6 +235,7 @@ type UpdateUserProfileParams struct {
 	Phone           pgtype.Text `json:"phone"`
 	NicknamePresent bool        `json:"nickname_present"`
 	Nickname        pgtype.Text `json:"nickname"`
+	Locale          pgtype.Text `json:"locale"`
 }
 
 func (q *Queries) UpdateUserProfile(ctx context.Context, arg UpdateUserProfileParams) (User, error) {
@@ -246,6 +252,7 @@ func (q *Queries) UpdateUserProfile(ctx context.Context, arg UpdateUserProfilePa
 		arg.Phone,
 		arg.NicknamePresent,
 		arg.Nickname,
+		arg.Locale,
 	)
 	var i User
 	err := row.Scan(
@@ -265,6 +272,7 @@ func (q *Queries) UpdateUserProfile(ctx context.Context, arg UpdateUserProfilePa
 		&i.Bio,
 		&i.Phone,
 		&i.Nickname,
+		&i.Locale,
 	)
 	return i, err
 }

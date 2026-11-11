@@ -8,6 +8,7 @@ import (
 
 	"github.com/alexcao194/kairso/internal/database"
 	"github.com/alexcao194/kairso/internal/features/notification"
+	"github.com/alexcao194/kairso/internal/i18n"
 	"github.com/alexcao194/kairso/pkg/pgutil"
 	"github.com/jackc/pgx/v5/pgtype"
 )
@@ -223,55 +224,34 @@ func projectResponseFromRow(row projectRow) ProjectResponse {
 }
 
 func (event ProjectNotificationEvent) ToNotificationEvent() notification.NotificationEvent {
+	params := map[string]string{}
+	if event.Role != "" {
+		params["role"] = string(event.Role)
+	}
+	if event.ProjectName != "" {
+		params["projectName"] = event.ProjectName
+	}
+
 	data := map[string]string{
 		"type":        event.Type,
 		"targetID":    event.ProjectID,
 		"projectId":   event.ProjectID,
 		"workspaceId": event.WorkspaceID,
 	}
-	if event.Role != "" {
-		data["role"] = string(event.Role)
+	for k, v := range params {
+		data[k] = v
 	}
-	projectName := event.ProjectName
-	if projectName == "" {
-		projectName = "dự án này"
-	} else {
-		data["projectName"] = projectName
+
+	title, body := i18n.RenderNotification(i18n.Default, event.Type, params)
+	if title == "" {
+		title, body = i18n.RenderNotification(i18n.Default, "project_updated", params)
 	}
-	role := roleLabel(string(event.Role))
-	switch event.Type {
-	case NotificationTypeProjectMemberAdded:
-		return notification.NotificationEvent{
-			UserID:      event.RecipientID,
-			WorkspaceID: event.WorkspaceID,
-			Title:       "Bạn được thêm vào dự án",
-			Body:        fmt.Sprintf("Bạn đã được thêm vào %s với vai trò %s", projectName, role),
-			Data:        data,
-		}
-	case NotificationTypeProjectMemberRoleUpdated:
-		return notification.NotificationEvent{
-			UserID:      event.RecipientID,
-			WorkspaceID: event.WorkspaceID,
-			Title:       "Vai trò trong dự án đã thay đổi",
-			Body:        fmt.Sprintf("Vai trò của bạn trong %s đã được đổi thành %s", projectName, role),
-			Data:        data,
-		}
-	case NotificationTypeProjectMemberRemoved:
-		return notification.NotificationEvent{
-			UserID:      event.RecipientID,
-			WorkspaceID: event.WorkspaceID,
-			Title:       "Bạn đã bị xoá khỏi dự án",
-			Body:        fmt.Sprintf("Bạn đã bị xoá khỏi %s", projectName),
-			Data:        data,
-		}
-	default:
-		return notification.NotificationEvent{
-			UserID:      event.RecipientID,
-			WorkspaceID: event.WorkspaceID,
-			Title:       "Dự án có cập nhật",
-			Body:        "Một dự án đã thay đổi",
-			Data:        data,
-		}
+	return notification.NotificationEvent{
+		UserID:      event.RecipientID,
+		WorkspaceID: event.WorkspaceID,
+		Title:       title,
+		Body:        body,
+		Data:        data,
 	}
 }
 
@@ -786,16 +766,4 @@ func pgtypeText(value *string) pgtype.Text {
 		return pgtype.Text{}
 	}
 	return pgtype.Text{String: *value, Valid: true}
-}
-
-func roleLabel(role string) string {
-	switch role {
-	case "holder":
-		return "chủ dự án"
-	case "admin":
-		return "quản trị viên"
-	case "member":
-		return "thành viên"
-	}
-	return role
 }

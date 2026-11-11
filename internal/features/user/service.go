@@ -4,6 +4,7 @@ import (
 	"context"
 
 	"github.com/alexcao194/kairso/internal/api/rest/middleware"
+	"github.com/alexcao194/kairso/internal/i18n"
 	"github.com/alexcao194/kairso/pkg/realtime"
 )
 
@@ -55,6 +56,9 @@ func (s *service) GetUserByAlias(ctx context.Context, alias string) (*UserRespon
 }
 
 func (s *service) UpdateMe(ctx context.Context, userID string, req UpdateMeRequest) (*UserResponse, error) {
+	if req.Locale != nil && !i18n.IsSupported(*req.Locale) {
+		req.Locale = nil // bỏ qua locale lạ thay vì làm hỏng cả bản cập nhật
+	}
 	user, err := s.repo.UpdateUser(ctx, userID, req)
 	if err != nil {
 		return nil, err

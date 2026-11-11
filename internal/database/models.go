@@ -691,6 +691,7 @@ type User struct {
 	Bio              pgtype.Text        `json:"bio"`
 	Phone            pgtype.Text        `json:"phone"`
 	Nickname         pgtype.Text        `json:"nickname"`
+	Locale           string             `json:"locale"`
 }
 
 type WhatsNewRelease struct {

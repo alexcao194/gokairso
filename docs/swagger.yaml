@@ -62,10 +62,6 @@ definitions:
       memberName:
         type: string
       originalCheckInAt:
-        description: |-
-          Original*At snapshots the target record's time as of submission (only
-          set alongside a Target*RecordID), so a decision can always be
-          reverted to it.
         format: date-time
         type: string
       originalCheckOutAt:
@@ -74,19 +70,12 @@ definitions:
       reason:
         type: string
       resultCheckInRecordId:
-        description: |-
-          Result*RecordID is the attendance_records row currently reflecting
-          each half's applied state (freshly created, or == the target id once
-          an edit is approved). Empty while pending/rejected.
         type: string
       resultCheckOutRecordId:
         type: string
       status:
         $ref: '#/definitions/AttendanceCorrectionStatus'
       targetCheckInRecordId:
-        description: |-
-          Target*RecordID is set when this half corrects an EXISTING
-          attendance_records row rather than adding a new one.
         type: string
       targetCheckOutRecordId:
         type: string
@@ -271,11 +260,8 @@ definitions:
       comment:
         type: string
       kpi:
-        description: same as Score
         type: number
       score:
-        description: Score set by admin/holder for the period (raw value, direct KPI
-          %).
         type: number
     type: object
   AttitudeResponse:
@@ -403,10 +389,6 @@ definitions:
       registeredByAvatar:
         type: string
       registeredById:
-        description: |-
-          Who submitted this day — the member themselves for a self-
-          registration, or the holder who filled it in on their behalf. Empty
-          for rows created before this was tracked.
         type: string
       registeredByName:
         type: string
@@ -453,7 +435,6 @@ definitions:
       contentType:
         type: string
       folderId:
-        description: rỗng = gốc workspace
         type: string
       isPublic:
         type: boolean
@@ -471,7 +452,6 @@ definitions:
       name:
         type: string
       parentId:
-        description: rỗng = gốc workspace
         type: string
     type: object
   CreateInitiativeRequest:
@@ -513,8 +493,6 @@ definitions:
         format: date
         type: string
       projectId:
-        description: ProjectID scopes the minutes to a project; empty = workspace
-          level.
         type: string
       recorders:
         items:
@@ -735,15 +713,10 @@ definitions:
   CustomerKPIDetail:
     properties:
       kpi:
-        description: KPI contribution = Score * 1 % (expressed as a percentage value,
-          e.g. 7.0 means 7 %).
         type: number
       rawEstimate:
-        description: Raw sum of feedback estimates (beneficiary-weighted) for this
-          member.
         type: number
       score:
-        description: Score after clamping to [0, 10], with default of 5.
         type: number
     type: object
   DailyReportResponse:
@@ -878,7 +851,6 @@ definitions:
   FileSettingsResponse:
     properties:
       allowedTypes:
-        description: csv đuôi file, rỗng = mọi loại
         type: string
       maxFileSizeMb:
         type: integer
@@ -914,7 +886,6 @@ definitions:
       kind:
         type: string
       locked:
-        description: kind != custom → không sửa cấu trúc
         type: boolean
       moduleId:
         type: string
@@ -939,13 +910,10 @@ definitions:
   InitiativeKPIDetail:
     properties:
       kpi:
-        description: KPI contribution = Score * 1 %.
         type: number
       rawEstimate:
-        description: Sum of approved initiative estimates within the period.
         type: number
       score:
-        description: Clamped to [0, 5].
         type: number
     type: object
   InitiativeResponse:
@@ -1091,12 +1059,6 @@ definitions:
   ListProjectMembersResponse:
     properties:
       availableMembers:
-        description: |-
-          AvailableMembers (workspace members not yet on the project, for the
-          invite picker) is only populated when the request opted in via
-          ?includeAvailable=true — omitted (not an empty array) otherwise, so a
-          plain roster read doesn't pay to compute it. See
-          repository.ListProjectMembers.
         items:
           $ref: '#/definitions/ProjectAvailableMemberResponse'
         type: array
@@ -1136,11 +1098,8 @@ definitions:
       content:
         type: string
       id:
-        description: ID is a client-generated stable id; the server fills one in when
-          empty.
         type: string
       module:
-        description: Module is the sub-system the row is about ("phân hệ"), free text.
         type: string
       note:
         type: string
@@ -1156,8 +1115,6 @@ definitions:
       status:
         allOf:
         - $ref: '#/definitions/MeetingItemStatus'
-        description: 'Status is used by deployed rows: open = waiting to be rolled
-          out.'
         enum:
         - open
         - done
@@ -1275,13 +1232,10 @@ definitions:
   MemberTaskBreakdownResponse:
     properties:
       bugTasks:
-        description: 'BugTasks: member is a fault holder.'
         items:
           $ref: '#/definitions/MemberTaskBrief'
         type: array
       completedLateTasks:
-        description: 'CompletedLateTasks: member is a worker and the task was finished
-          after its due date.'
         items:
           $ref: '#/definitions/MemberTaskBrief'
         type: array
@@ -1292,14 +1246,10 @@ definitions:
       month:
         type: string
       overdueTasks:
-        description: 'OverdueTasks: member is a worker, task still open and past its
-          due date.'
         items:
           $ref: '#/definitions/MemberTaskBrief'
         type: array
       reworkTasks:
-        description: 'ReworkTasks: member is a worker and the task was sent back (return_count
-          > 0).'
         items:
           $ref: '#/definitions/MemberTaskBrief'
         type: array
@@ -1381,7 +1331,6 @@ definitions:
   ModuleResponse:
     properties:
       attachmentCount:
-        description: AttachmentCount is how many documents are uploaded to the module.
         type: integer
       createdAt:
         format: date-time
@@ -1399,7 +1348,6 @@ definitions:
         format: date-time
         type: string
       sprints:
-        description: Sprints are the module's own time-boxes, oldest first.
         items:
           $ref: '#/definitions/ModuleSprintResponse'
         type: array
@@ -1409,9 +1357,6 @@ definitions:
       status:
         allOf:
         - $ref: '#/definitions/ModuleStatus'
-        description: |-
-          Status is the Scrum lifecycle. EndDate is the target release date;
-          StartDate follows the first sprint once the module has sprints.
         enum:
         - backlog
         - in_progress
@@ -1434,7 +1379,6 @@ definitions:
         format: date
         type: string
       goal:
-        description: Goal is the Sprint Goal agreed at Sprint Planning.
         type: string
       id:
         type: string
@@ -1445,7 +1389,6 @@ definitions:
       retroNote:
         type: string
       reviewNote:
-        description: ReviewNote / RetroNote record the Sprint Review and Retrospective.
         type: string
       startDate:
         format: date
@@ -1468,16 +1411,6 @@ definitions:
     - done
     - released
     type: string
-    x-enum-comments:
-      ModuleStatusBacklog: in the Product Backlog
-      ModuleStatusDone: meets the Definition of Done
-      ModuleStatusInProgress: being built across sprints
-      ModuleStatusReleased: increment shipped to users
-    x-enum-descriptions:
-    - in the Product Backlog
-    - being built across sprints
-    - meets the Definition of Done
-    - increment shipped to users
     x-enum-varnames:
     - ModuleStatusBacklog
     - ModuleStatusInProgress
@@ -1659,10 +1592,8 @@ definitions:
   ProgressKPIDetail:
     properties:
       kpi:
-        description: KPI contribution = (1 - LateRatio) * 35 %.
         type: number
       lateRatio:
-        description: Ratio of late tasks among reviewed/done tasks (0–1).
         type: number
       lateWorkerEstimation:
         type: number
@@ -1702,10 +1633,6 @@ definitions:
   ProjectFeedbackResponse:
     properties:
       code:
-        description: |-
-          Code is a human-readable, copyable identifier derived from the
-          project name and SequenceNo, e.g. "#KAIRSO-F7" — resolved in hydrate
-          rather than stored, mirroring task.Code/task.FeedbackCode.
         type: string
       content:
         type: string
@@ -1921,7 +1848,6 @@ definitions:
   PublicModuleResponse:
     properties:
       endDate:
-        description: EndDate is the target release date.
         format: date-time
         type: string
       name:
@@ -1992,31 +1918,21 @@ definitions:
   PunctualityKPIDetail:
     properties:
       deduction:
-        description: Deduction points, clamped to [0, 15]. = (LateDays + EarlyLeaveDays)
-          * 1 + RawEstimate, clamped.
         type: number
       earlyLeaveDays:
-        description: Count of days the member checked out before the schedule end.
         type: integer
       kpi:
-        description: |-
-          Points earned toward the PunctualityWeight cap = PunctualityWeight - Deduction (not negative — this is
-          "points remaining after deduction", mirroring how the other categories contribute a positive amount).
         type: number
       lateDays:
-        description: Count of days the member checked in after the schedule start.
         type: integer
       rawEstimate:
-        description: Sum of late-log estimates within the period.
         type: number
     type: object
   QualityKPIDetail:
     properties:
       kpi:
-        description: KPI contribution = Ratio * 30 %.
         type: number
       ratio:
-        description: Ratio of clean (non-bug) work (0–1).
         type: number
       totalBugEstimation:
         type: number
@@ -2408,7 +2324,6 @@ definitions:
       memberId:
         type: string
       month:
-        description: YYYY-MM
         type: string
       score:
         type: number
@@ -2591,11 +2506,6 @@ definitions:
       archived:
         type: boolean
       code:
-        description: |-
-          Code is a human-readable, copyable task identifier derived from the
-          project name and SequenceNo, e.g. "#KAIRSO-42". Resolved in
-          hydrateTask rather than stored, so it always reflects the project's
-          current name.
         type: string
       createdAt:
         format: date-time
@@ -2625,10 +2535,6 @@ definitions:
           $ref: '#/definitions/TaskLabelResponse'
         type: array
       linkedFeedbackCount:
-        description: |-
-          LinkedFeedbackCount is how many public-project-feedback items link to
-          this task — surfaced so the UI can show a "view feedback" affordance
-          only on tasks that actually have any, without a separate lookup per row.
         type: integer
       moduleId:
         type: string
@@ -2650,12 +2556,6 @@ definitions:
       title:
         type: string
       unreadCommentCount:
-        description: |-
-          UnreadCommentCount is how many of this task's comments the CALLER
-          (not just anyone) hasn't read yet — see task_comment_reads. Only
-          populated where the caller's identity is available and worth the
-          extra query (list/update endpoints); 0 elsewhere, not "definitely
-          read".
         type: integer
       updatedAt:
         format: date-time
@@ -2701,8 +2601,6 @@ definitions:
       memberName:
         type: string
       priority1:
-        description: Priority1..4 là số task theo độ ưu tiên thô (1..4, 4 = Gấp/P0),
-          độc lập với trạng thái.
         type: integer
       priority2:
         type: integer
@@ -2730,11 +2628,6 @@ definitions:
   TaskStatsTotalsResponse:
     properties:
       avgCycleDays:
-        description: |-
-          AvgCycleDays: thời gian hoàn thành trung bình (ngày) từ lúc tạo đến lần hoàn thành
-          đầu tiên — tính độc lập trên toàn bộ task khớp bộ lọc, không cộng dồn được từ các
-          dòng Members (xem GetTaskCycleTimeByWorkspaceAlias). CycleTimeSampleSize là số task
-          đã tính (0 nếu chưa có task nào hoàn thành trong kỳ).
         type: number
       backlog:
         type: integer
@@ -2817,11 +2710,6 @@ definitions:
       archived:
         type: boolean
       code:
-        description: |-
-          Code is a human-readable, copyable task identifier derived from the
-          project name and SequenceNo, e.g. "#KAIRSO-42". Resolved in
-          hydrateTask rather than stored, so it always reflects the project's
-          current name.
         type: string
       createdAt:
         format: date-time
@@ -2853,17 +2741,8 @@ definitions:
       latestComment:
         $ref: '#/definitions/ThreadLatestCommentResponse'
       linkedFeedbackCount:
-        description: |-
-          LinkedFeedbackCount is how many public-project-feedback items link to
-          this task — surfaced so the UI can show a "view feedback" affordance
-          only on tasks that actually have any, without a separate lookup per row.
         type: integer
       mentioned:
-        description: |-
-          Mentioned is true if the caller was ever @mentioned in one of this
-          task's comments (task_comment_mentions) — as opposed to only being
-          assigned to it — drives the "@" vs generic chat-icon affordance
-          client-side.
         type: boolean
       moduleId:
         type: string
@@ -2885,12 +2764,6 @@ definitions:
       title:
         type: string
       unreadCommentCount:
-        description: |-
-          UnreadCommentCount is how many of this task's comments the CALLER
-          (not just anyone) hasn't read yet — see task_comment_reads. Only
-          populated where the caller's identity is available and worth the
-          extra query (list/update endpoints); 0 elsewhere, not "definitely
-          read".
         type: integer
       updatedAt:
         format: date-time
@@ -2932,7 +2805,6 @@ definitions:
       kind:
         type: string
       locked:
-        description: kind != custom → không sửa cấu trúc
         type: boolean
       moduleId:
         type: string
@@ -2993,7 +2865,6 @@ definitions:
   UpdateFileRequest:
     properties:
       folderId:
-        description: '"" = gốc workspace'
         type: string
       isPublic:
         type: boolean
@@ -3007,7 +2878,6 @@ definitions:
       name:
         type: string
       parentId:
-        description: '"" = chuyển về gốc'
         type: string
     type: object
   UpdateInitiativeRequest:
@@ -3044,6 +2914,8 @@ definitions:
       bio:
         type: string
       birthday:
+        type: string
+      locale:
         type: string
       name:
         type: string
@@ -3348,6 +3220,8 @@ definitions:
         type: boolean
       id:
         type: string
+      locale:
+        type: string
       name:
         type: string
       nickname:
@@ -3426,10 +3300,6 @@ definitions:
       registeredByAvatar:
         type: string
       registeredById:
-        description: |-
-          Who submitted this day — the member themselves for a self-
-          registration, or the holder who filled it in on their behalf. Empty
-          for rows created before this was tracked.
         type: string
       registeredByName:
         type: string
@@ -3776,12 +3646,10 @@ paths:
         in: query
         name: sort
         type: string
-      - description: Page size.
-        in: query
+      - in: query
         name: limit
         type: integer
-      - description: Page number.
-        in: query
+      - in: query
         name: page
         type: integer
       produces:
@@ -4120,12 +3988,10 @@ paths:
     get:
       description: List pending workspace invitations for the authenticated user.
       parameters:
-      - description: Page size.
-        in: query
+      - in: query
         name: limit
         type: integer
-      - description: Page number.
-        in: query
+      - in: query
         name: page
         type: integer
       produces:
@@ -4489,12 +4355,10 @@ paths:
         name: moduleId
         required: true
         type: string
-      - description: Page size.
-        in: query
+      - in: query
         name: limit
         type: integer
-      - description: Page number.
-        in: query
+      - in: query
         name: page
         type: integer
       produces:
@@ -4770,17 +4634,13 @@ paths:
         name: projectId
         required: true
         type: string
-      - description: Page size.
-        in: query
+      - in: query
         name: limit
         type: integer
-      - description: Filter task stats (taskCount/totalEstimation) to this month,
-          YYYY-MM.
-        in: query
+      - in: query
         name: month
         type: string
-      - description: Page number.
-        in: query
+      - in: query
         name: page
         type: integer
       produces:
@@ -5176,12 +5036,10 @@ paths:
         name: taskId
         required: true
         type: string
-      - description: Page size.
-        in: query
+      - in: query
         name: limit
         type: integer
-      - description: Page number.
-        in: query
+      - in: query
         name: page
         type: integer
       produces:
@@ -5393,12 +5251,10 @@ paths:
     get:
       description: List paginated app release notes ("what's new"), newest first
       parameters:
-      - description: Page size.
-        in: query
+      - in: query
         name: limit
         type: integer
-      - description: Page number.
-        in: query
+      - in: query
         name: page
         type: integer
       produces:
@@ -5424,12 +5280,10 @@ paths:
   /v1/workspaces:
     get:
       parameters:
-      - description: Page size.
-        in: query
+      - in: query
         name: limit
         type: integer
-      - description: Page number.
-        in: query
+      - in: query
         name: page
         type: integer
       produces:
@@ -5545,12 +5399,10 @@ paths:
         in: query
         name: status
         type: string
-      - description: Page size.
-        in: query
+      - in: query
         name: limit
         type: integer
-      - description: Page number.
-        in: query
+      - in: query
         name: page
         type: integer
       produces:
@@ -5693,12 +5545,10 @@ paths:
         in: query
         name: status
         type: string
-      - description: Page size.
-        in: query
+      - in: query
         name: limit
         type: integer
-      - description: Page number.
-        in: query
+      - in: query
         name: page
         type: integer
       produces:
@@ -5817,12 +5667,10 @@ paths:
         in: query
         name: memberId
         type: string
-      - description: Page size.
-        in: query
+      - in: query
         name: limit
         type: integer
-      - description: Page number.
-        in: query
+      - in: query
         name: page
         type: integer
       produces:
@@ -6186,12 +6034,10 @@ paths:
         in: query
         name: to
         type: string
-      - description: Page size.
-        in: query
+      - in: query
         name: limit
         type: integer
-      - description: Page number.
-        in: query
+      - in: query
         name: page
         type: integer
       produces:
@@ -6370,12 +6216,10 @@ paths:
         in: query
         name: to
         type: string
-      - description: Page size.
-        in: query
+      - in: query
         name: limit
         type: integer
-      - description: Page number.
-        in: query
+      - in: query
         name: page
         type: integer
       produces:
@@ -6791,12 +6635,10 @@ paths:
         name: workspaceId
         required: true
         type: string
-      - description: Page size.
-        in: query
+      - in: query
         name: limit
         type: integer
-      - description: Page number.
-        in: query
+      - in: query
         name: page
         type: integer
       produces:
@@ -6875,12 +6717,10 @@ paths:
         name: workspaceId
         required: true
         type: string
-      - description: Page size.
-        in: query
+      - in: query
         name: limit
         type: integer
-      - description: Page number.
-        in: query
+      - in: query
         name: page
         type: integer
       produces:
@@ -6924,12 +6764,10 @@ paths:
         in: query
         name: to
         type: string
-      - description: Page size.
-        in: query
+      - in: query
         name: limit
         type: integer
-      - description: Page number.
-        in: query
+      - in: query
         name: page
         type: integer
       produces:
@@ -7376,12 +7214,10 @@ paths:
         in: query
         name: to
         type: string
-      - description: Page size.
-        in: query
+      - in: query
         name: limit
         type: integer
-      - description: Page number.
-        in: query
+      - in: query
         name: page
         type: integer
       produces:
@@ -7451,12 +7287,10 @@ paths:
         name: workspaceId
         required: true
         type: string
-      - description: Page size.
-        in: query
+      - in: query
         name: limit
         type: integer
-      - description: Page number.
-        in: query
+      - in: query
         name: page
         type: integer
       produces:
@@ -7545,12 +7379,10 @@ paths:
         in: query
         name: q
         type: string
-      - description: Page size.
-        in: query
+      - in: query
         name: limit
         type: integer
-      - description: Page number.
-        in: query
+      - in: query
         name: page
         type: integer
       produces:
@@ -7620,12 +7452,10 @@ paths:
         name: workspaceId
         required: true
         type: string
-      - description: Page size.
-        in: query
+      - in: query
         name: limit
         type: integer
-      - description: Page number.
-        in: query
+      - in: query
         name: page
         type: integer
       produces:
@@ -7804,12 +7634,10 @@ paths:
         in: query
         name: sort
         type: string
-      - description: Page size.
-        in: query
+      - in: query
         name: limit
         type: integer
-      - description: Page number.
-        in: query
+      - in: query
         name: page
         type: integer
       produces:
@@ -7870,12 +7698,10 @@ paths:
         name: workspaceId
         required: true
         type: string
-      - description: Page size.
-        in: query
+      - in: query
         name: limit
         type: integer
-      - description: Page number.
-        in: query
+      - in: query
         name: page
         type: integer
       produces:
@@ -7995,12 +7821,10 @@ paths:
         name: workspaceId
         required: true
         type: string
-      - description: Page size.
-        in: query
+      - in: query
         name: limit
         type: integer
-      - description: Page number.
-        in: query
+      - in: query
         name: page
         type: integer
       produces:
@@ -8100,17 +7924,13 @@ paths:
         name: workspaceId
         required: true
         type: string
-      - description: Page size.
-        in: query
+      - in: query
         name: limit
         type: integer
-      - description: Filter task stats (taskCount/totalEstimation) to this month,
-          YYYY-MM.
-        in: query
+      - in: query
         name: month
         type: string
-      - description: Page number.
-        in: query
+      - in: query
         name: page
         type: integer
       produces:
@@ -8422,12 +8242,10 @@ paths:
         name: projectId
         required: true
         type: string
-      - description: Page size.
-        in: query
+      - in: query
         name: limit
         type: integer
-      - description: Page number.
-        in: query
+      - in: query
         name: page
         type: integer
       produces:
@@ -8517,12 +8335,10 @@ paths:
         name: projectId
         required: true
         type: string
-      - description: Page size.
-        in: query
+      - in: query
         name: limit
         type: integer
-      - description: Page number.
-        in: query
+      - in: query
         name: page
         type: integer
       produces:
@@ -8550,12 +8366,10 @@ paths:
         name: projectId
         required: true
         type: string
-      - description: Page size.
-        in: query
+      - in: query
         name: limit
         type: integer
-      - description: Page number.
-        in: query
+      - in: query
         name: page
         type: integer
       produces:
@@ -8615,12 +8429,10 @@ paths:
         name: projectId
         required: true
         type: string
-      - description: Page size.
-        in: query
+      - in: query
         name: limit
         type: integer
-      - description: Page number.
-        in: query
+      - in: query
         name: page
         type: integer
       produces:
@@ -8751,12 +8563,10 @@ paths:
         name: projectId
         required: true
         type: string
-      - description: Page size.
-        in: query
+      - in: query
         name: limit
         type: integer
-      - description: Page number.
-        in: query
+      - in: query
         name: page
         type: integer
       - description: Also compute workspace members not yet on this project (for the
@@ -8906,12 +8716,10 @@ paths:
         name: projectId
         required: true
         type: string
-      - description: Page size.
-        in: query
+      - in: query
         name: limit
         type: integer
-      - description: Page number.
-        in: query
+      - in: query
         name: page
         type: integer
       produces:
@@ -9072,12 +8880,10 @@ paths:
         in: query
         name: sort
         type: string
-      - description: Page size.
-        in: query
+      - in: query
         name: limit
         type: integer
-      - description: Page number.
-        in: query
+      - in: query
         name: page
         type: integer
       produces:
@@ -9223,12 +9029,10 @@ paths:
         in: query
         name: sort
         type: string
-      - description: Page size.
-        in: query
+      - in: query
         name: limit
         type: integer
-      - description: Page number.
-        in: query
+      - in: query
         name: page
         type: integer
       produces:
@@ -9414,12 +9218,10 @@ paths:
         name: workspaceId
         required: true
         type: string
-      - description: Page size.
-        in: query
+      - in: query
         name: limit
         type: integer
-      - description: Page number.
-        in: query
+      - in: query
         name: page
         type: integer
       produces:
@@ -9538,12 +9340,10 @@ paths:
         in: query
         name: status
         type: string
-      - description: Page size.
-        in: query
+      - in: query
         name: limit
         type: integer
-      - description: Page number.
-        in: query
+      - in: query
         name: page
         type: integer
       produces:
@@ -9763,12 +9563,10 @@ paths:
         in: query
         name: to
         type: string
-      - description: Page size.
-        in: query
+      - in: query
         name: limit
         type: integer
-      - description: Page number.
-        in: query
+      - in: query
         name: page
         type: integer
       produces:
@@ -9807,12 +9605,10 @@ paths:
         in: query
         name: status
         type: string
-      - description: Page size.
-        in: query
+      - in: query
         name: limit
         type: integer
-      - description: Page number.
-        in: query
+      - in: query
         name: page
         type: integer
       produces:
