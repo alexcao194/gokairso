@@ -14,6 +14,7 @@ import (
 	"github.com/alexcao194/kairso/internal/database"
 	"github.com/alexcao194/kairso/internal/features/attendance"
 	"github.com/alexcao194/kairso/internal/features/auth"
+	"github.com/alexcao194/kairso/internal/features/device"
 	"github.com/alexcao194/kairso/internal/features/event"
 	"github.com/alexcao194/kairso/internal/features/files"
 	"github.com/alexcao194/kairso/internal/features/meeting"
@@ -26,6 +27,7 @@ import (
 	"github.com/alexcao194/kairso/internal/features/user"
 	"github.com/alexcao194/kairso/internal/features/whatsnew"
 	"github.com/alexcao194/kairso/internal/features/workspace"
+	"github.com/alexcao194/kairso/pkg/firebase"
 	"github.com/alexcao194/kairso/pkg/httpx"
 	"github.com/alexcao194/kairso/pkg/jwt"
 	storage "github.com/alexcao194/kairso/pkg/minio"
@@ -51,6 +53,7 @@ type Server struct {
 	performance      *performance.Handler
 	event            *event.Handler
 	files            *files.Handler
+	device           *device.Handler
 	notificationSvc  notification.Service
 	notification     *notification.Handler
 	whatsNewHandler  *whatsnew.Handler
@@ -85,6 +88,16 @@ func NewServer(cfg config.Config, db *pgxpool.Pool) *Server {
 	if err := notificationSvc.StartConsumer(context.Background(), notificationPubSub); err != nil {
 		slog.Warn("Notification consumer is not available", "error", err)
 	}
+
+	// Push notifications (FCM). The messenger is optional: without Firebase
+	// credentials the device service still stores tokens but sends nothing.
+	messenger, err := firebase.NewMessenger(context.Background(), cfg.App.FirebaseCredentialsPath)
+	if err != nil {
+		slog.Warn("Push messenger is not available", "error", err)
+		messenger = nil
+	}
+	deviceSvc := device.NewService(device.NewRepository(db), messenger)
+	notificationSvc.SetPusher(deviceSvc)
 
 	minIOClient, err := storage.NewClient(cfg.Storage)
 	if err != nil {
@@ -162,6 +175,7 @@ func NewServer(cfg config.Config, db *pgxpool.Pool) *Server {
 		performance:      performance.NewHandler(initiativeSvc, lateLogSvc, feedbackSvc, kpiSvc),
 		event:            event.NewHandler(eventSvc),
 		files:            files.NewHandler(filesSvc),
+		device:           device.NewHandler(deviceSvc),
 		notificationSvc:  notificationSvc,
 		notification:     notification.NewHandler(notificationSvc, &workspaceResolver{svc: workspaceSvc}),
 		whatsNewHandler:  whatsnew.NewHandler(whatsNewSvc),
@@ -202,6 +216,7 @@ func (s *Server) setupRoutes(mux *http.ServeMux) {
 	apiMux := http.NewServeMux()
 	s.authHandler.RegisterRoutes(apiMux)
 	s.userHandler.RegisterRoutes(apiMux, s.authMid)
+	s.device.RegisterRoutes(apiMux, s.authMid)
 	s.workspaceHandler.RegisterRoutes(apiMux, s.authMid)
 	s.projectHandler.RegisterRoutes(apiMux, s.authMid)
 	s.moduleHandler.RegisterRoutes(apiMux, s.authMid)

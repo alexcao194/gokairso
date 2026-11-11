@@ -20,10 +20,17 @@ type Service interface {
 	HandleNotificationEvent(ctx context.Context, event NotificationEvent) (*NotificationResponse, error)
 }
 
+// Pusher delivers a persisted notification to a user's devices (push). It is
+// optional; when unset, notifications are in-app/realtime only.
+type Pusher interface {
+	PushToUser(ctx context.Context, userID, defaultTitle, defaultBody string, data map[string]string)
+}
+
 type service struct {
 	repo      Repository
 	publisher message.Publisher
 	rt        realtime.Broadcaster
+	pusher    Pusher
 }
 
 func NewService(repo Repository, publisher message.Publisher) *service {
@@ -32,6 +39,10 @@ func NewService(repo Repository, publisher message.Publisher) *service {
 
 func (s *service) SetRealtime(rt realtime.Broadcaster) {
 	s.rt = rt
+}
+
+func (s *service) SetPusher(p Pusher) {
+	s.pusher = p
 }
 
 func (s *service) broadcastUnreadCount(ctx context.Context, workspaceID, userID, eventType string) {
@@ -114,6 +125,9 @@ func (s *service) HandleNotificationEvent(ctx context.Context, event Notificatio
 	resp, err := s.repo.CreateNotification(ctx, event)
 	if err == nil {
 		s.broadcastUnreadCount(ctx, event.WorkspaceID, event.UserID, "notification.created")
+		if s.pusher != nil {
+			go s.pusher.PushToUser(context.WithoutCancel(ctx), event.UserID, event.Title, event.Body, event.Data)
+		}
 	}
 	return resp, err
 }

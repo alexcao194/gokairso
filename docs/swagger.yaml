@@ -1953,6 +1953,15 @@ definitions:
       refreshToken:
         type: string
     type: object
+  RegisterDeviceRequest:
+    properties:
+      locale:
+        type: string
+      platform:
+        type: string
+      token:
+        type: string
+    type: object
   Response-AttendanceCorrectionRequestResponse:
     properties:
       hasMore:
@@ -2830,6 +2839,11 @@ definitions:
     properties:
       unreadCount:
         type: integer
+    type: object
+  UnregisterDeviceRequest:
+    properties:
+      token:
+        type: string
     type: object
   UpdateFeedbackRequest:
     properties:
@@ -3854,6 +3868,65 @@ paths:
       summary: Refresh Token
       tags:
       - Auth
+  /v1/devices:
+    delete:
+      consumes:
+      - application/json
+      description: Remove the caller's FCM device token (e.g. on logout)
+      parameters:
+      - description: Device token
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/UnregisterDeviceRequest'
+      produces:
+      - application/json
+      responses:
+        "204":
+          description: No Content
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/ErrorResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/ErrorResponse'
+      security:
+      - BearerAuth: []
+      summary: Unregister a push device token
+      tags:
+      - Devices
+    post:
+      consumes:
+      - application/json
+      description: Register or refresh the caller's FCM device token for push notifications
+      parameters:
+      - description: Device token
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/RegisterDeviceRequest'
+      produces:
+      - application/json
+      responses:
+        "204":
+          description: No Content
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/ErrorResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/ErrorResponse'
+      security:
+      - BearerAuth: []
+      summary: Register a push device token
+      tags:
+      - Devices
   /v1/feedbacks/{feedbackId}:
     delete:
       parameters:
