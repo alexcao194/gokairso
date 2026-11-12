@@ -23,6 +23,7 @@ import (
 	"github.com/alexcao194/kairso/internal/features/performance"
 	"github.com/alexcao194/kairso/internal/features/project"
 	"github.com/alexcao194/kairso/internal/features/projectfeedback"
+	"github.com/alexcao194/kairso/internal/features/quote"
 	"github.com/alexcao194/kairso/internal/features/task"
 	"github.com/alexcao194/kairso/internal/features/user"
 	"github.com/alexcao194/kairso/internal/features/whatsnew"
@@ -54,6 +55,7 @@ type Server struct {
 	event            *event.Handler
 	files            *files.Handler
 	device           *device.Handler
+	quote            *quote.Handler
 	notificationSvc  notification.Service
 	notification     *notification.Handler
 	whatsNewHandler  *whatsnew.Handler
@@ -176,6 +178,7 @@ func NewServer(cfg config.Config, db *pgxpool.Pool) *Server {
 		event:            event.NewHandler(eventSvc),
 		files:            files.NewHandler(filesSvc),
 		device:           device.NewHandler(deviceSvc),
+		quote:            quote.NewHandler(quote.NewService(quote.NewRepository(db))),
 		notificationSvc:  notificationSvc,
 		notification:     notification.NewHandler(notificationSvc, &workspaceResolver{svc: workspaceSvc}),
 		whatsNewHandler:  whatsnew.NewHandler(whatsNewSvc),
@@ -217,6 +220,7 @@ func (s *Server) setupRoutes(mux *http.ServeMux) {
 	s.authHandler.RegisterRoutes(apiMux)
 	s.userHandler.RegisterRoutes(apiMux, s.authMid)
 	s.device.RegisterRoutes(apiMux, s.authMid)
+	s.quote.RegisterRoutes(apiMux, s.authMid)
 	s.workspaceHandler.RegisterRoutes(apiMux, s.authMid)
 	s.projectHandler.RegisterRoutes(apiMux, s.authMid)
 	s.moduleHandler.RegisterRoutes(apiMux, s.authMid)

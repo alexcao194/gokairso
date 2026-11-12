@@ -604,6 +604,13 @@ definitions:
       name:
         type: string
     type: object
+  CreateQuoteRequest:
+    properties:
+      customerId:
+        type: string
+      moduleId:
+        type: string
+    type: object
   CreateTaskAttachmentRequest:
     properties:
       contentType:
@@ -710,6 +717,13 @@ definitions:
       name:
         type: string
     type: object
+  Currency:
+    properties:
+      code:
+        type: string
+      minorUnits:
+        type: integer
+    type: object
   CustomerKPIDetail:
     properties:
       kpi:
@@ -718,6 +732,48 @@ definitions:
         type: number
       score:
         type: number
+    type: object
+  CustomerRequest:
+    properties:
+      address:
+        type: string
+      contactName:
+        type: string
+      email:
+        type: string
+      name:
+        type: string
+      note:
+        type: string
+      phone:
+        type: string
+      taxCode:
+        type: string
+    type: object
+  CustomerResponse:
+    properties:
+      address:
+        type: string
+      contactName:
+        type: string
+      createdAt:
+        format: date-time
+        type: string
+      email:
+        type: string
+      id:
+        type: string
+      name:
+        type: string
+      note:
+        type: string
+      phone:
+        type: string
+      taxCode:
+        type: string
+      updatedAt:
+        format: date-time
+        type: string
     type: object
   DailyReportResponse:
     properties:
@@ -1552,6 +1608,29 @@ definitions:
     x-enum-varnames:
     - ParticipantUser
     - ParticipantGroup
+  PartyInfo:
+    properties:
+      address:
+        type: string
+      bankInfo:
+        type: string
+      contactName:
+        type: string
+      email:
+        type: string
+      logoUrl:
+        type: string
+      name:
+        type: string
+      phone:
+        type: string
+      signatureUrl:
+        type: string
+      taxCode:
+        type: string
+      website:
+        type: string
+    type: object
   PresignUploadRequest:
     properties:
       contentType:
@@ -1941,6 +2020,236 @@ definitions:
       totalWorkerEstimation:
         type: number
     type: object
+  QuoteEventResponse:
+    properties:
+      actorName:
+        type: string
+      createdAt:
+        format: date-time
+        type: string
+      note:
+        type: string
+      type:
+        type: string
+    type: object
+  QuoteItemRequest:
+    properties:
+      description:
+        type: string
+      discountPercent:
+        type: number
+      name:
+        type: string
+      quantity:
+        type: number
+      unit:
+        type: string
+      unitPrice:
+        type: integer
+    type: object
+  QuoteItemResponse:
+    properties:
+      description:
+        type: string
+      discountPercent:
+        type: number
+      id:
+        type: string
+      lineTotal:
+        type: integer
+      name:
+        type: string
+      position:
+        type: integer
+      quantity:
+        type: number
+      unit:
+        type: string
+      unitPrice:
+        type: integer
+    type: object
+  QuoteResponse:
+    properties:
+      amountInWords:
+        type: string
+      createdAt:
+        format: date-time
+        type: string
+      currency:
+        type: string
+      customer:
+        $ref: '#/definitions/PartyInfo'
+      customerId:
+        type: string
+      decidedAt:
+        format: date-time
+        type: string
+      discountAmount:
+        type: integer
+      discountPercent:
+        type: number
+      discountTotal:
+        type: integer
+      discountType:
+        type: string
+      editable:
+        type: boolean
+      events:
+        items:
+          $ref: '#/definitions/QuoteEventResponse'
+        type: array
+      grandTotal:
+        type: integer
+      id:
+        type: string
+      issueDate:
+        format: date
+        type: string
+      issuer:
+        $ref: '#/definitions/PartyInfo'
+      items:
+        items:
+          $ref: '#/definitions/QuoteItemResponse'
+        type: array
+      language:
+        type: string
+      minorUnits:
+        type: integer
+      moduleId:
+        type: string
+      moduleName:
+        type: string
+      notes:
+        type: string
+      number:
+        type: string
+      projectId:
+        type: string
+      projectName:
+        type: string
+      sentAt:
+        format: date-time
+        type: string
+      status:
+        type: string
+      subtotal:
+        type: integer
+      taxTotal:
+        type: integer
+      terms:
+        type: string
+      title:
+        type: string
+      updatedAt:
+        format: date-time
+        type: string
+      validUntil:
+        format: date
+        type: string
+      vatRate:
+        type: number
+    type: object
+  QuoteSettingsRequest:
+    properties:
+      address:
+        type: string
+      bankInfo:
+        type: string
+      companyName:
+        type: string
+      defaultCurrency:
+        type: string
+      defaultTerms:
+        type: string
+      defaultValidDays:
+        type: integer
+      defaultVatRate:
+        type: number
+      email:
+        type: string
+      logoUrl:
+        type: string
+      numberPrefix:
+        type: string
+      phone:
+        type: string
+      signatureUrl:
+        type: string
+      taxCode:
+        type: string
+      website:
+        type: string
+    type: object
+  QuoteSettingsResponse:
+    properties:
+      address:
+        type: string
+      bankInfo:
+        type: string
+      companyName:
+        type: string
+      defaultCurrency:
+        type: string
+      defaultTerms:
+        type: string
+      defaultValidDays:
+        type: integer
+      defaultVatRate:
+        type: number
+      email:
+        type: string
+      logoUrl:
+        type: string
+      numberPrefix:
+        type: string
+      phone:
+        type: string
+      signatureUrl:
+        type: string
+      taxCode:
+        type: string
+      website:
+        type: string
+    type: object
+  QuoteSummaryResponse:
+    properties:
+      createdAt:
+        format: date-time
+        type: string
+      currency:
+        type: string
+      customerName:
+        type: string
+      grandTotal:
+        type: integer
+      id:
+        type: string
+      issueDate:
+        format: date
+        type: string
+      minorUnits:
+        type: integer
+      moduleId:
+        type: string
+      moduleName:
+        type: string
+      number:
+        type: string
+      projectId:
+        type: string
+      projectName:
+        type: string
+      sentAt:
+        format: date-time
+        type: string
+      status:
+        type: string
+      title:
+        type: string
+      validUntil:
+        format: date
+        type: string
+    type: object
   ReadNotificationsRequest:
     properties:
       ids:
@@ -2248,6 +2557,19 @@ definitions:
       page:
         type: integer
     type: object
+  Response-internal_features_quote_QuoteSummaryResponse:
+    properties:
+      hasMore:
+        type: boolean
+      items:
+        items:
+          $ref: '#/definitions/QuoteSummaryResponse'
+        type: array
+      limit:
+        type: integer
+      page:
+        type: integer
+    type: object
   Response-internal_features_task_TaskHistoryResponse:
     properties:
       hasMore:
@@ -2336,6 +2658,11 @@ definitions:
         type: string
       score:
         type: number
+    type: object
+  SetQuoteStatusRequest:
+    properties:
+      status:
+        type: string
     type: object
   SprintStatus:
     enum:
@@ -3058,6 +3385,39 @@ definitions:
         type: string
       name:
         type: string
+    type: object
+  UpdateQuoteRequest:
+    properties:
+      currency:
+        type: string
+      customerId:
+        type: string
+      discountAmount:
+        type: integer
+      discountPercent:
+        type: number
+      discountType:
+        type: string
+      issueDate:
+        format: date
+        type: string
+      items:
+        items:
+          $ref: '#/definitions/QuoteItemRequest'
+        type: array
+      language:
+        type: string
+      notes:
+        type: string
+      terms:
+        type: string
+      title:
+        type: string
+      validUntil:
+        format: date
+        type: string
+      vatRate:
+        type: number
     type: object
   UpdateTaskCommentRequest:
     properties:
@@ -3868,6 +4228,23 @@ paths:
       summary: Refresh Token
       tags:
       - Auth
+  /v1/currencies:
+    get:
+      description: Every supported ISO 4217 currency with its minor-unit digits
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/Currency'
+            type: array
+      security:
+      - BearerAuth: []
+      summary: List currencies
+      tags:
+      - Quotes
   /v1/devices:
     delete:
       consumes:
@@ -6134,6 +6511,133 @@ paths:
         only)
       tags:
       - Calendar Events
+  /v1/workspaces/{workspaceId}/customers:
+    get:
+      parameters:
+      - description: Workspace ID
+        in: path
+        name: workspaceId
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/CustomerResponse'
+            type: array
+        "403":
+          description: Forbidden
+          schema:
+            $ref: '#/definitions/ErrorResponse'
+      security:
+      - BearerAuth: []
+      summary: List customers
+      tags:
+      - Quotes
+    post:
+      consumes:
+      - application/json
+      parameters:
+      - description: Workspace ID
+        in: path
+        name: workspaceId
+        required: true
+        type: string
+      - description: Customer
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/CustomerRequest'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/CustomerResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/ErrorResponse'
+        "403":
+          description: Forbidden
+          schema:
+            $ref: '#/definitions/ErrorResponse'
+      security:
+      - BearerAuth: []
+      summary: Create customer
+      tags:
+      - Quotes
+  /v1/workspaces/{workspaceId}/customers/{customerId}:
+    delete:
+      description: Quotes keep their customer snapshot; drafts lose the link
+      parameters:
+      - description: Workspace ID
+        in: path
+        name: workspaceId
+        required: true
+        type: string
+      - description: Customer ID
+        in: path
+        name: customerId
+        required: true
+        type: string
+      responses:
+        "204":
+          description: No Content
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/ErrorResponse'
+      security:
+      - BearerAuth: []
+      summary: Delete customer
+      tags:
+      - Quotes
+    put:
+      consumes:
+      - application/json
+      parameters:
+      - description: Workspace ID
+        in: path
+        name: workspaceId
+        required: true
+        type: string
+      - description: Customer ID
+        in: path
+        name: customerId
+        required: true
+        type: string
+      - description: Customer
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/CustomerRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/CustomerResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/ErrorResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/ErrorResponse'
+      security:
+      - BearerAuth: []
+      summary: Update customer
+      tags:
+      - Quotes
   /v1/workspaces/{workspaceId}/daily-reports:
     get:
       parameters:
@@ -9180,6 +9684,317 @@ paths:
       summary: Get Project Overviews Across Projects
       tags:
       - Projects
+  /v1/workspaces/{workspaceId}/quote-settings:
+    get:
+      parameters:
+      - description: Workspace ID
+        in: path
+        name: workspaceId
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/QuoteSettingsResponse'
+      security:
+      - BearerAuth: []
+      summary: Get quote settings
+      tags:
+      - Quotes
+    put:
+      consumes:
+      - application/json
+      parameters:
+      - description: Workspace ID
+        in: path
+        name: workspaceId
+        required: true
+        type: string
+      - description: Settings
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/QuoteSettingsRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/QuoteSettingsResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/ErrorResponse'
+      security:
+      - BearerAuth: []
+      summary: Update quote settings
+      tags:
+      - Quotes
+  /v1/workspaces/{workspaceId}/quotes:
+    get:
+      parameters:
+      - description: Workspace ID
+        in: path
+        name: workspaceId
+        required: true
+        type: string
+      - description: Filter by module
+        in: query
+        name: moduleId
+        type: string
+      - description: Filter by project
+        in: query
+        name: projectId
+        type: string
+      - description: Filter by stored status
+        in: query
+        name: status
+        type: string
+      - in: query
+        name: limit
+        type: integer
+      - in: query
+        name: page
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/Response-internal_features_quote_QuoteSummaryResponse'
+      security:
+      - BearerAuth: []
+      summary: List quotes
+      tags:
+      - Quotes
+    post:
+      consumes:
+      - application/json
+      parameters:
+      - description: Workspace ID
+        in: path
+        name: workspaceId
+        required: true
+        type: string
+      - description: Module (and optional customer)
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/CreateQuoteRequest'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/QuoteResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/ErrorResponse'
+      security:
+      - BearerAuth: []
+      summary: Create a draft quote for a module
+      tags:
+      - Quotes
+  /v1/workspaces/{workspaceId}/quotes/{quoteId}:
+    delete:
+      parameters:
+      - description: Workspace ID
+        in: path
+        name: workspaceId
+        required: true
+        type: string
+      - description: Quote ID
+        in: path
+        name: quoteId
+        required: true
+        type: string
+      responses:
+        "204":
+          description: No Content
+        "409":
+          description: Conflict
+          schema:
+            $ref: '#/definitions/ErrorResponse'
+      security:
+      - BearerAuth: []
+      summary: Delete a draft quote
+      tags:
+      - Quotes
+    get:
+      parameters:
+      - description: Workspace ID
+        in: path
+        name: workspaceId
+        required: true
+        type: string
+      - description: Quote ID
+        in: path
+        name: quoteId
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/QuoteResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/ErrorResponse'
+      security:
+      - BearerAuth: []
+      summary: Get quote
+      tags:
+      - Quotes
+    put:
+      consumes:
+      - application/json
+      description: Replaces the header and all lines; totals are recomputed server-side
+      parameters:
+      - description: Workspace ID
+        in: path
+        name: workspaceId
+        required: true
+        type: string
+      - description: Quote ID
+        in: path
+        name: quoteId
+        required: true
+        type: string
+      - description: Quote
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/UpdateQuoteRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/QuoteResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/ErrorResponse'
+        "409":
+          description: Conflict
+          schema:
+            $ref: '#/definitions/ErrorResponse'
+      security:
+      - BearerAuth: []
+      summary: Update a draft quote
+      tags:
+      - Quotes
+  /v1/workspaces/{workspaceId}/quotes/{quoteId}/duplicate:
+    post:
+      parameters:
+      - description: Workspace ID
+        in: path
+        name: workspaceId
+        required: true
+        type: string
+      - description: Quote ID
+        in: path
+        name: quoteId
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/QuoteResponse'
+      security:
+      - BearerAuth: []
+      summary: Duplicate a quote as a new draft
+      tags:
+      - Quotes
+  /v1/workspaces/{workspaceId}/quotes/{quoteId}/send:
+    post:
+      description: Locks the draft and snapshots customer + issuer details
+      parameters:
+      - description: Workspace ID
+        in: path
+        name: workspaceId
+        required: true
+        type: string
+      - description: Quote ID
+        in: path
+        name: quoteId
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/QuoteResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/ErrorResponse'
+        "409":
+          description: Conflict
+          schema:
+            $ref: '#/definitions/ErrorResponse'
+      security:
+      - BearerAuth: []
+      summary: Send a quote
+      tags:
+      - Quotes
+  /v1/workspaces/{workspaceId}/quotes/{quoteId}/status:
+    post:
+      consumes:
+      - application/json
+      description: accepted/rejected (from sent) or cancelled (from draft/sent)
+      parameters:
+      - description: Workspace ID
+        in: path
+        name: workspaceId
+        required: true
+        type: string
+      - description: Quote ID
+        in: path
+        name: quoteId
+        required: true
+        type: string
+      - description: Status
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/SetQuoteStatusRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/QuoteResponse'
+        "409":
+          description: Conflict
+          schema:
+            $ref: '#/definitions/ErrorResponse'
+      security:
+      - BearerAuth: []
+      summary: Set quote status
+      tags:
+      - Quotes
   /v1/workspaces/{workspaceId}/task/statistics:
     get:
       parameters:

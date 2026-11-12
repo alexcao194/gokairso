@@ -272,6 +272,20 @@ type AttendanceReminder struct {
 	ReminderType string             `json:"reminder_type"`
 }
 
+type Customer struct {
+	ID          pgtype.UUID        `json:"id"`
+	WorkspaceID pgtype.UUID        `json:"workspace_id"`
+	Name        string             `json:"name"`
+	TaxCode     string             `json:"tax_code"`
+	Address     string             `json:"address"`
+	ContactName string             `json:"contact_name"`
+	Email       string             `json:"email"`
+	Phone       string             `json:"phone"`
+	Note        string             `json:"note"`
+	CreatedAt   pgtype.Timestamptz `json:"created_at"`
+	UpdatedAt   pgtype.Timestamptz `json:"updated_at"`
+}
+
 type CustomerFeedback struct {
 	ID           pgtype.UUID        `json:"id"`
 	CreatedAt    pgtype.Timestamptz `json:"created_at"`
@@ -602,6 +616,85 @@ type ProjectUser struct {
 	ProjectID pgtype.UUID `json:"project_id"`
 	UserID    pgtype.UUID `json:"user_id"`
 	Role      ProjectRole `json:"role"`
+}
+
+type Quote struct {
+	ID               pgtype.UUID        `json:"id"`
+	WorkspaceID      pgtype.UUID        `json:"workspace_id"`
+	ProjectID        pgtype.UUID        `json:"project_id"`
+	ModuleID         pgtype.UUID        `json:"module_id"`
+	CustomerID       pgtype.UUID        `json:"customer_id"`
+	Number           string             `json:"number"`
+	Title            string             `json:"title"`
+	Status           string             `json:"status"`
+	Currency         string             `json:"currency"`
+	Language         string             `json:"language"`
+	IssueDate        pgtype.Date        `json:"issue_date"`
+	ValidUntil       pgtype.Date        `json:"valid_until"`
+	DiscountType     string             `json:"discount_type"`
+	DiscountValue    int64              `json:"discount_value"`
+	VatBp            int32              `json:"vat_bp"`
+	Subtotal         int64              `json:"subtotal"`
+	DiscountTotal    int64              `json:"discount_total"`
+	TaxTotal         int64              `json:"tax_total"`
+	GrandTotal       int64              `json:"grand_total"`
+	CustomerSnapshot []byte             `json:"customer_snapshot"`
+	IssuerSnapshot   []byte             `json:"issuer_snapshot"`
+	Notes            string             `json:"notes"`
+	Terms            string             `json:"terms"`
+	CreatedBy        pgtype.UUID        `json:"created_by"`
+	SentAt           pgtype.Timestamptz `json:"sent_at"`
+	DecidedAt        pgtype.Timestamptz `json:"decided_at"`
+	CreatedAt        pgtype.Timestamptz `json:"created_at"`
+	UpdatedAt        pgtype.Timestamptz `json:"updated_at"`
+}
+
+type QuoteCounter struct {
+	WorkspaceID pgtype.UUID `json:"workspace_id"`
+	Year        int32       `json:"year"`
+	LastNumber  int32       `json:"last_number"`
+}
+
+type QuoteEvent struct {
+	ID        pgtype.UUID        `json:"id"`
+	QuoteID   pgtype.UUID        `json:"quote_id"`
+	Type      string             `json:"type"`
+	ActorID   pgtype.UUID        `json:"actor_id"`
+	Note      string             `json:"note"`
+	CreatedAt pgtype.Timestamptz `json:"created_at"`
+}
+
+type QuoteItem struct {
+	ID            pgtype.UUID `json:"id"`
+	QuoteID       pgtype.UUID `json:"quote_id"`
+	Position      int32       `json:"position"`
+	Name          string      `json:"name"`
+	Description   string      `json:"description"`
+	Unit          string      `json:"unit"`
+	QuantityMilli int64       `json:"quantity_milli"`
+	UnitPrice     int64       `json:"unit_price"`
+	DiscountBp    int32       `json:"discount_bp"`
+	LineTotal     int64       `json:"line_total"`
+}
+
+type QuoteSetting struct {
+	WorkspaceID      pgtype.UUID        `json:"workspace_id"`
+	CompanyName      string             `json:"company_name"`
+	Address          string             `json:"address"`
+	TaxCode          string             `json:"tax_code"`
+	Phone            string             `json:"phone"`
+	Email            string             `json:"email"`
+	Website          string             `json:"website"`
+	BankInfo         string             `json:"bank_info"`
+	LogoUrl          string             `json:"logo_url"`
+	SignatureUrl     string             `json:"signature_url"`
+	NumberPrefix     string             `json:"number_prefix"`
+	DefaultCurrency  string             `json:"default_currency"`
+	DefaultVatBp     int32              `json:"default_vat_bp"`
+	DefaultValidDays int32              `json:"default_valid_days"`
+	DefaultTerms     string             `json:"default_terms"`
+	CreatedAt        pgtype.Timestamptz `json:"created_at"`
+	UpdatedAt        pgtype.Timestamptz `json:"updated_at"`
 }
 
 type Task struct {
