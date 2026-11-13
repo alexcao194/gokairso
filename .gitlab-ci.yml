@@ -140,7 +140,9 @@ release:
     - test -n "$DOCKERHUB_NAMESPACE" || { echo "Thiếu DOCKERHUB_NAMESPACE"; exit 1; }
     - echo "$DOCKERHUB_TOKEN" | docker login -u "$DOCKERHUB_USER" --password-stdin
     - docker run --privileged --rm tonistiigi/binfmt --install all   # QEMU cho arm64
-    - docker buildx create --use --name kairso >/dev/null 2>&1 || docker buildx use kairso
+    # buildx refuses TLS settings taken from env (dind); build from a context.
+    - docker context inspect kairso-ctx >/dev/null 2>&1 || docker context create kairso-ctx
+    - docker buildx create --use --name kairso kairso-ctx
   script:
     - IMG="$DOCKERHUB_NAMESPACE/kairso-server"
     - docker buildx build --platform linux/amd64,linux/arm64 -f Dockerfile.release
