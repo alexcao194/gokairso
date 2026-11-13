@@ -114,6 +114,8 @@ deploy:
     - $SSH "cd '$DEPLOY_DIR' && docker compose up -d --no-build postgres"
     - $SSH "cd '$DEPLOY_DIR' && docker compose run --rm migrate"
     - $SSH "cd '$DEPLOY_DIR' && docker compose up -d --no-build --remove-orphans"
+    # Keep only the image just deployed so repeated deploys don't fill the disk.
+    - $SSH "docker images --format '{{.Repository}}:{{.Tag}}' | grep '^kairso-server:' | grep -vxF '$APP_IMAGE' | xargs -r docker rmi; docker image prune -f >/dev/null" || true
     # nginx.conf bind-mount → compose không tự nhận đổi; reload để config mới có hiệu lực (no-op nếu không đổi)
     - $SSH "cd '$DEPLOY_DIR' && docker compose exec -T nginx nginx -s reload"
     - $SSH "cd '$DEPLOY_DIR' && docker compose ps"
