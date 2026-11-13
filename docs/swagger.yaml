@@ -3617,6 +3617,69 @@ definitions:
       name:
         type: string
     type: object
+  WebhookDeliveryResponse:
+    properties:
+      attempts:
+        type: integer
+      createdAt:
+        format: date-time
+        type: string
+      durationMs:
+        type: integer
+      error:
+        type: string
+      eventId:
+        type: string
+      eventType:
+        type: string
+      id:
+        type: string
+      statusCode:
+        type: integer
+      success:
+        type: boolean
+    type: object
+  WebhookRequest:
+    properties:
+      enabled:
+        type: boolean
+      name:
+        type: string
+      token:
+        description: Token authenticates deliveries. Left empty on create, one is
+          generated.
+        type: string
+      url:
+        type: string
+    type: object
+  WebhookResponse:
+    properties:
+      createdAt:
+        format: date-time
+        type: string
+      enabled:
+        type: boolean
+      failureCount:
+        type: integer
+      id:
+        type: string
+      lastDeliveredAt:
+        format: date-time
+        type: string
+      lastError:
+        type: string
+      lastStatus:
+        type: integer
+      name:
+        type: string
+      token:
+        type: string
+      updatedAt:
+        format: date-time
+        type: string
+      url:
+        type: string
+    type: object
   WhatsNewNoteResponse:
     properties:
       content:
@@ -10161,6 +10224,201 @@ paths:
       summary: Count Threads
       tags:
       - Tasks
+  /v1/workspaces/{workspaceId}/webhooks:
+    get:
+      description: Outgoing webhooks of a workspace (holder/admin only)
+      parameters:
+      - description: Workspace ID
+        in: path
+        name: workspaceId
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/WebhookResponse'
+            type: array
+        "403":
+          description: Forbidden
+          schema:
+            $ref: '#/definitions/ErrorResponse'
+      security:
+      - BearerAuth: []
+      summary: List webhooks
+      tags:
+      - Webhooks
+    post:
+      consumes:
+      - application/json
+      description: 'Every workspace event is POSTed to the URL as a Payload, with
+        "Authorization: Bearer <token>" and an "X-Kairso-Signature: sha256=<HMAC-SHA256(token,
+        body)>" header'
+      parameters:
+      - description: Workspace ID
+        in: path
+        name: workspaceId
+        required: true
+        type: string
+      - description: Webhook
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/WebhookRequest'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/WebhookResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/ErrorResponse'
+        "403":
+          description: Forbidden
+          schema:
+            $ref: '#/definitions/ErrorResponse'
+      security:
+      - BearerAuth: []
+      summary: Create webhook
+      tags:
+      - Webhooks
+  /v1/workspaces/{workspaceId}/webhooks/{webhookId}:
+    delete:
+      parameters:
+      - description: Workspace ID
+        in: path
+        name: workspaceId
+        required: true
+        type: string
+      - description: Webhook ID
+        in: path
+        name: webhookId
+        required: true
+        type: string
+      responses:
+        "204":
+          description: No Content
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/ErrorResponse'
+      security:
+      - BearerAuth: []
+      summary: Delete webhook
+      tags:
+      - Webhooks
+    put:
+      consumes:
+      - application/json
+      description: An empty token keeps the current one; re-enabling resets the failure
+        counter
+      parameters:
+      - description: Workspace ID
+        in: path
+        name: workspaceId
+        required: true
+        type: string
+      - description: Webhook ID
+        in: path
+        name: webhookId
+        required: true
+        type: string
+      - description: Webhook
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/WebhookRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/WebhookResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/ErrorResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/ErrorResponse'
+      security:
+      - BearerAuth: []
+      summary: Update webhook
+      tags:
+      - Webhooks
+  /v1/workspaces/{workspaceId}/webhooks/{webhookId}/deliveries:
+    get:
+      description: The latest 50 deliveries of a webhook (kept for 7 days)
+      parameters:
+      - description: Workspace ID
+        in: path
+        name: workspaceId
+        required: true
+        type: string
+      - description: Webhook ID
+        in: path
+        name: webhookId
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/WebhookDeliveryResponse'
+            type: array
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/ErrorResponse'
+      security:
+      - BearerAuth: []
+      summary: Recent deliveries
+      tags:
+      - Webhooks
+  /v1/workspaces/{workspaceId}/webhooks/{webhookId}/test:
+    post:
+      description: Sends one "webhook.test" event immediately and returns the endpoint's
+        answer
+      parameters:
+      - description: Workspace ID
+        in: path
+        name: workspaceId
+        required: true
+        type: string
+      - description: Webhook ID
+        in: path
+        name: webhookId
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/WebhookDeliveryResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/ErrorResponse'
+      security:
+      - BearerAuth: []
+      summary: Send a test event
+      tags:
+      - Webhooks
   /v1/workspaces/{workspaceId}/work/schedules:
     put:
       consumes:

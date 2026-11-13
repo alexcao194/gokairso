@@ -797,6 +797,35 @@ type User struct {
 	Locale           string             `json:"locale"`
 }
 
+type Webhook struct {
+	ID              pgtype.UUID        `json:"id"`
+	WorkspaceID     pgtype.UUID        `json:"workspace_id"`
+	Name            string             `json:"name"`
+	Url             string             `json:"url"`
+	Token           string             `json:"token"`
+	Enabled         bool               `json:"enabled"`
+	FailureCount    int32              `json:"failure_count"`
+	LastStatus      pgtype.Int4        `json:"last_status"`
+	LastError       string             `json:"last_error"`
+	LastDeliveredAt pgtype.Timestamptz `json:"last_delivered_at"`
+	CreatedBy       pgtype.UUID        `json:"created_by"`
+	CreatedAt       pgtype.Timestamptz `json:"created_at"`
+	UpdatedAt       pgtype.Timestamptz `json:"updated_at"`
+}
+
+type WebhookDelivery struct {
+	ID         pgtype.UUID        `json:"id"`
+	WebhookID  pgtype.UUID        `json:"webhook_id"`
+	EventID    pgtype.UUID        `json:"event_id"`
+	EventType  string             `json:"event_type"`
+	Success    bool               `json:"success"`
+	StatusCode int32              `json:"status_code"`
+	Error      string             `json:"error"`
+	Attempts   int32              `json:"attempts"`
+	DurationMs int32              `json:"duration_ms"`
+	CreatedAt  pgtype.Timestamptz `json:"created_at"`
+}
+
 type WhatsNewRelease struct {
 	ID          pgtype.UUID        `json:"id"`
 	Version     string             `json:"version"`

@@ -7,10 +7,12 @@ import (
 	"fmt"
 	"strings"
 
+	"github.com/alexcao194/kairso/internal/api/rest/middleware"
 	"github.com/alexcao194/kairso/internal/database"
 	"github.com/alexcao194/kairso/pkg/currency"
 	"github.com/alexcao194/kairso/pkg/pagination"
 	"github.com/alexcao194/kairso/pkg/pgutil"
+	"github.com/alexcao194/kairso/pkg/realtime"
 	"github.com/jackc/pgx/v5/pgtype"
 )
 
@@ -37,10 +39,37 @@ const (
 
 type Service struct {
 	repo Repository
+	rt   realtime.Broadcaster
 }
 
 func NewService(repo Repository) *Service {
 	return &Service{repo: repo}
+}
+
+func (s *Service) SetRealtime(rt realtime.Broadcaster) { s.rt = rt }
+
+// emit publishes a quote event (to connected clients and webhooks).
+func (s *Service) emit(ctx context.Context, eventType, workspaceID, callerID, quoteID string, entity any) {
+	if s.rt == nil {
+		return
+	}
+	s.rt.Broadcast(realtime.Event{
+		Type:        eventType,
+		WorkspaceID: workspaceID,
+		EntityID:    quoteID,
+		ActorID:     callerID,
+		ActorConnID: middleware.GetConnIDFromContext(ctx),
+		Entity:      entity,
+	})
+}
+
+// loadAndEmit reloads the quote, announces the change and returns it.
+func (s *Service) loadAndEmit(ctx context.Context, eventType, workspaceID, callerID string, ws, id pgtype.UUID) (*QuoteResponse, error) {
+	resp, err := s.load(ctx, ws, id)
+	if err == nil {
+		s.emit(ctx, eventType, workspaceID, callerID, resp.ID, resp)
+	}
+	return resp, err
 }
 
 func parseID(s, what string) (pgtype.UUID, error) {
@@ -330,7 +359,7 @@ func (s *Service) CreateQuote(ctx context.Context, workspaceID, callerID string,
 	if err != nil {
 		return nil, err
 	}
-	return s.load(ctx, ws, quoteID)
+	return s.loadAndEmit(ctx, "quote.created", workspaceID, callerID, ws, quoteID)
 }
 
 func (s *Service) ensureCustomer(ctx context.Context, ws pgtype.UUID, customerID string) (pgtype.UUID, error) {
@@ -520,7 +549,7 @@ func (s *Service) UpdateQuote(ctx context.Context, workspaceID, callerID, quoteI
 	if err != nil {
 		return nil, err
 	}
-	return s.load(ctx, ws, id)
+	return s.loadAndEmit(ctx, "quote.updated", workspaceID, callerID, ws, id)
 }
 
 func (s *Service) DeleteQuote(ctx context.Context, workspaceID, callerID, quoteID string) error {
@@ -535,8 +564,11 @@ func (s *Service) DeleteQuote(ctx context.Context, workspaceID, callerID, quoteI
 	if _, err := s.draft(ctx, ws, id); err != nil {
 		return err
 	}
-	_, err = s.repo.DeleteQuote(ctx, id, ws)
-	return err
+	if _, err = s.repo.DeleteQuote(ctx, id, ws); err != nil {
+		return err
+	}
+	s.emit(ctx, "quote.deleted", workspaceID, callerID, quoteID, map[string]string{"id": quoteID})
+	return nil
 }
 
 func (s *Service) SendQuote(ctx context.Context, workspaceID, callerID, quoteID string) (*QuoteResponse, error) {
@@ -592,7 +624,7 @@ func (s *Service) SendQuote(ctx context.Context, workspaceID, callerID, quoteID 
 	if err != nil {
 		return nil, err
 	}
-	return s.load(ctx, ws, id)
+	return s.loadAndEmit(ctx, "quote.sent", workspaceID, callerID, ws, id)
 }
 
 func (s *Service) DuplicateQuote(ctx context.Context, workspaceID, callerID, quoteID string) (*QuoteResponse, error) {
@@ -665,7 +697,7 @@ func (s *Service) DuplicateQuote(ctx context.Context, workspaceID, callerID, quo
 	if err != nil {
 		return nil, err
 	}
-	return s.load(ctx, ws, newID)
+	return s.loadAndEmit(ctx, "quote.created", workspaceID, callerID, ws, newID)
 }
 
 // SetStatus records a decision on a sent quote, or cancels a draft/sent one.
@@ -704,5 +736,5 @@ func (s *Service) SetStatus(ctx context.Context, workspaceID, callerID, quoteID 
 	if err != nil {
 		return nil, err
 	}
-	return s.load(ctx, ws, id)
+	return s.loadAndEmit(ctx, "quote."+req.Status, workspaceID, callerID, ws, id)
 }

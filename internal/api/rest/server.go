@@ -26,6 +26,7 @@ import (
 	"github.com/alexcao194/kairso/internal/features/quote"
 	"github.com/alexcao194/kairso/internal/features/task"
 	"github.com/alexcao194/kairso/internal/features/user"
+	"github.com/alexcao194/kairso/internal/features/webhook"
 	"github.com/alexcao194/kairso/internal/features/whatsnew"
 	"github.com/alexcao194/kairso/internal/features/workspace"
 	"github.com/alexcao194/kairso/pkg/firebase"
@@ -56,6 +57,7 @@ type Server struct {
 	files            *files.Handler
 	device           *device.Handler
 	quote            *quote.Handler
+	webhook          *webhook.Handler
 	notificationSvc  notification.Service
 	notification     *notification.Handler
 	whatsNewHandler  *whatsnew.Handler
@@ -109,34 +111,38 @@ func NewServer(cfg config.Config, db *pgxpool.Pool) *Server {
 	}
 
 	realtimeHub := realtime.NewHub()
+	// Every event goes to connected clients (hub) and to outgoing webhooks.
+	webhookSvc := webhook.NewService(webhook.NewRepository(db), cfg.App.WebhookAllowPrivateHosts)
+	events := realtime.Fanout(realtimeHub, webhookSvc)
 
-	notificationSvc.SetRealtime(realtimeHub)
+	notificationSvc.SetRealtime(events)
 
 	userRepo := user.NewRepository(db)
 	userSvc := user.NewService(userRepo)
-	userSvc.SetRealtime(realtimeHub)
+	userSvc.SetRealtime(events)
 
 	workspaceRepo := workspace.NewRepository(db)
 	workspaceSvc := workspace.NewService(workspaceRepo, workspace.NewNotificationPublisher(notificationSvc))
-	workspaceSvc.SetRealtime(realtimeHub)
+	workspaceSvc.SetRealtime(events)
 
 	projectRepo := project.NewRepository(db)
 	projectSvc := project.NewService(projectRepo, project.NewNotificationPublisher(notificationSvc))
-	projectSvc.SetRealtime(realtimeHub)
+	projectSvc.SetRealtime(events)
 
 	moduleRepo := module.NewRepository(db)
 	moduleSvc := module.NewService(moduleRepo)
-	moduleSvc.SetRealtime(realtimeHub)
+	moduleSvc.SetRealtime(events)
 
 	taskRepo := task.NewRepository(db)
 	taskSvc := task.NewService(taskRepo, task.NewNotificationPublisher(notificationSvc))
-	taskSvc.SetRealtime(realtimeHub)
+	taskSvc.SetRealtime(events)
 
 	attendanceRepo := attendance.NewRepository(db)
 	attendancePublisher := attendance.NewNotificationPublisher(notificationSvc)
 	attendanceCoreSvc, attendanceSettingsSvc, attendanceSvc, workScheduleSvc, attendanceStatsSvc, taskStatsSvc, workWeekSvc, checkRequestSvc, dailyReportSvc := attendance.NewServices(attendanceRepo, attendancePublisher)
-	attendanceCoreSvc.SetRealtime(realtimeHub)
+	attendanceCoreSvc.SetRealtime(events)
 	backgroundCtx, backgroundCancel := context.WithCancel(context.Background())
+	webhookSvc.Start(backgroundCtx)
 	if db != nil {
 		attendance.NewAttendanceReminderService(attendanceRepo, attendancePublisher).Start(backgroundCtx)
 		task.NewDeadlineReminderService(taskRepo, task.NewNotificationPublisher(notificationSvc)).Start(backgroundCtx)
@@ -144,7 +150,7 @@ func NewServer(cfg config.Config, db *pgxpool.Pool) *Server {
 
 	performanceRepo := performance.NewRepository(db)
 	performanceCoreSvc, initiativeSvc, lateLogSvc, feedbackSvc, kpiSvc := performance.NewServices(performanceRepo, performance.NewNotificationPublisher(notificationSvc))
-	performanceCoreSvc.SetRealtime(realtimeHub)
+	performanceCoreSvc.SetRealtime(events)
 
 	eventRepo := event.NewRepository(db)
 	eventSvc := event.NewService(eventRepo)
@@ -152,7 +158,7 @@ func NewServer(cfg config.Config, db *pgxpool.Pool) *Server {
 	whatsNewSvc := whatsnew.NewService(whatsnew.NewRepository(db))
 
 	meetingSvc := meeting.NewService(meeting.NewRepository(db))
-	meetingSvc.SetRealtime(realtimeHub)
+	meetingSvc.SetRealtime(events)
 
 	projectFeedbackRepo := projectfeedback.NewRepository(db)
 	projectFeedbackSvc := projectfeedback.NewService(projectFeedbackRepo)
@@ -163,6 +169,9 @@ func NewServer(cfg config.Config, db *pgxpool.Pool) *Server {
 		filesStorage = minIOClient
 	}
 	filesSvc := files.NewService(filesRepo, filesStorage)
+
+	quoteSvc := quote.NewService(quote.NewRepository(db))
+	quoteSvc.SetRealtime(events)
 
 	s := &Server{
 		cfg:              cfg,
@@ -178,7 +187,8 @@ func NewServer(cfg config.Config, db *pgxpool.Pool) *Server {
 		event:            event.NewHandler(eventSvc),
 		files:            files.NewHandler(filesSvc),
 		device:           device.NewHandler(deviceSvc),
-		quote:            quote.NewHandler(quote.NewService(quote.NewRepository(db))),
+		quote:            quote.NewHandler(quoteSvc),
+		webhook:          webhook.NewHandler(webhookSvc),
 		notificationSvc:  notificationSvc,
 		notification:     notification.NewHandler(notificationSvc, &workspaceResolver{svc: workspaceSvc}),
 		whatsNewHandler:  whatsnew.NewHandler(whatsNewSvc),
@@ -221,6 +231,7 @@ func (s *Server) setupRoutes(mux *http.ServeMux) {
 	s.userHandler.RegisterRoutes(apiMux, s.authMid)
 	s.device.RegisterRoutes(apiMux, s.authMid)
 	s.quote.RegisterRoutes(apiMux, s.authMid)
+	s.webhook.RegisterRoutes(apiMux, s.authMid)
 	s.workspaceHandler.RegisterRoutes(apiMux, s.authMid)
 	s.projectHandler.RegisterRoutes(apiMux, s.authMid)
 	s.moduleHandler.RegisterRoutes(apiMux, s.authMid)

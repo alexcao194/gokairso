@@ -43,6 +43,9 @@ type AppConfig struct {
 	RefreshTokenDuration    time.Duration
 	FirebaseCredentialsPath string
 	AppTokenSecret          string
+	// WebhookAllowPrivateHosts lets outgoing webhooks target loopback/private
+	// addresses (off by default to prevent SSRF on shared deployments).
+	WebhookAllowPrivateHosts bool
 }
 
 func (db DBConfig) DatabaseURL() string {
@@ -67,11 +70,12 @@ func Load() Config {
 			MaxConns: envDefault("DB_MAX_CONNS", "20"),
 		},
 		App: AppConfig{
-			JWTSecret:               mustEnv("JWT_SECRET"),
-			AccessTokenDuration:     parseDuration(mustEnv("JWT_ACCESS_EXPIRATION")),
-			RefreshTokenDuration:    parseDuration(mustEnv("JWT_REFRESH_EXPIRATION")),
-			FirebaseCredentialsPath: mustEnv("FIREBASE_CREDENTIALS_PATH"),
-			AppTokenSecret:          mustEnv("APP_TOKEN_SECRET"),
+			JWTSecret:                mustEnv("JWT_SECRET"),
+			AccessTokenDuration:      parseDuration(mustEnv("JWT_ACCESS_EXPIRATION")),
+			RefreshTokenDuration:     parseDuration(mustEnv("JWT_REFRESH_EXPIRATION")),
+			FirebaseCredentialsPath:  mustEnv("FIREBASE_CREDENTIALS_PATH"),
+			AppTokenSecret:           mustEnv("APP_TOKEN_SECRET"),
+			WebhookAllowPrivateHosts: parseBool(envDefault("WEBHOOK_ALLOW_PRIVATE_HOSTS", "false")),
 		},
 		Redis: RedisConfig{
 			Port:    mustEnv("REDIS_PORT"),
