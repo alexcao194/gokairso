@@ -11,8 +11,13 @@ COPY . .
 
 ARG TARGETOS
 ARG TARGETARCH
+# `go install` refuses GOBIN for cross-compiled binaries; it puts them in
+# $GOPATH/bin/<os>_<arch>/ instead (or $GOPATH/bin/ when not cross-compiling).
 RUN CGO_ENABLED=0 GOOS=$TARGETOS GOARCH=$TARGETARCH go build -buildvcs=false -o /out/server ./cmd/server \
- && CGO_ENABLED=0 GOOS=$TARGETOS GOARCH=$TARGETARCH GOBIN=/out go install github.com/pressly/goose/v3/cmd/goose@v3.26.0
+ && CGO_ENABLED=0 GOOS=$TARGETOS GOARCH=$TARGETARCH go install github.com/pressly/goose/v3/cmd/goose@v3.26.0 \
+ && GOOSE_BIN="$(go env GOPATH)/bin/${TARGETOS}_${TARGETARCH}/goose" \
+ && if [ ! -f "$GOOSE_BIN" ]; then GOOSE_BIN="$(go env GOPATH)/bin/goose"; fi \
+ && cp "$GOOSE_BIN" /out/goose
 
 FROM alpine:latest
 WORKDIR /app
